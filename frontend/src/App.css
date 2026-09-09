@@ -1,56 +1,44 @@
-.appLayout {
+.appShell {
+  height: 100svh;
+  overflow: hidden;
+  background: #111412;
+  color: #e8eee9;
+}
+
+.topBar {
+  min-height: 82px;
+  padding: 0 32px;
   display: flex;
-  width: 100%;
-  min-height: 100svh;
+  align-items: center;
+  justify-content: flex-start;
+  border-bottom: 1px solid #2a312c;
+  background: #171b18;
 }
+.studioControls { display: flex; gap: 14px; align-items: center; margin-left: 14px; }
+.viewSwitcher { display: flex; padding: 2px; border: 1px solid #3a463e; border-radius: 3px; background: #202720; }
+.viewSwitcher button { padding: 9px 11px; border: 0; color: #8c9b8f; background: transparent; cursor: pointer; font: 600 11px ui-monospace, monospace; }
+.viewSwitcher button:hover, .viewSwitcher button.active { color: #172016; background: #b8e56d; }
+.patternSelectControl { display: flex; gap: 7px; align-items: center; color: #8c9b8f; font: 10px ui-monospace, monospace; }
+.patternSelectControl select { max-width: 150px; padding: 8px 24px 8px 8px; border: 1px solid #3a463e; border-radius: 3px; color: #dce8df; background: #202720; font: 11px ui-monospace, monospace; }
+.bpmSelectControl { display: flex; gap: 7px; align-items: center; color: #8c9b8f; font: 10px ui-monospace, monospace; }
+.bpmSelectControl input { width: 54px; padding: 8px; border: 1px solid #3a463e; border-radius: 3px; color: #dce8df; background: #202720; font: 11px ui-monospace, monospace; }
 
-.playlist {
-  --playlist-row-height: 80px;
-  --playlist-line: rgba(0, 0, 0, 0.3);
-
-  flex: 0 0 90px;
-  width: 90px;
-  min-height: 100svh;
-  box-sizing: border-box;
-  border: 1px solid black;
-  background-color: rgba(53, 54, 51, 0.18);
-  background-image:
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent calc(var(--playlist-row-height) - 1px),
-      var(--playlist-line) calc(var(--playlist-row-height) - 1px),
-      var(--playlist-line) var(--playlist-row-height)
-    );
-}
-
-.row {
-  --cell-width: 10px;
-  --cell-height: 80px;
-  --grid-line: rgba(0, 0, 0, 0.3);
-
-  flex: 1 1 auto;
-  width: auto;
-  min-height: 100svh;
-  box-sizing: border-box;
-  background-color: rgba(152, 255, 93, 0.068);
-  background-image:
-    repeating-linear-gradient(
-      to right,
-      transparent 0,
-      transparent calc(var(--cell-width) - 1px),
-      var(--grid-line) calc(var(--cell-width) - 1px),
-      var(--grid-line) var(--cell-width)
-    ),
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent calc(var(--cell-height) - 1px),
-      var(--grid-line) calc(var(--cell-height) - 1px),
-      var(--grid-line) var(--cell-height)
-    );
-}
-
-.beatCollumn {
-  display: none;
-}
+.brandBlock { text-align: left; }
+.eyebrow { color: #8d9b91; font: 11px/1.2 ui-monospace, monospace; letter-spacing: 1.5px; }
+.brandBlock h1 { margin: 6px 0 0; color: #edf3ee; font: 600 21px/1.1 Georgia, serif; letter-spacing: 0; }
+.editorToggle, .transportButton { border: 1px solid #3a463e; border-radius: 3px; color: #dce8df; background: #202720; cursor: pointer; font: 600 12px/1 ui-monospace, monospace; }
+.editorToggle { padding: 13px 16px; display: flex; gap: 9px; align-items: center; }
+.editorToggle:hover, .editorToggle.isActive { border-color: #b8e56d; color: #c9f58b; }
+.toggleDot { width: 7px; height: 7px; border-radius: 50%; background: #90a294; }
+.isActive .toggleDot { background: #b8e56d; box-shadow: 0 0 10px #b8e56d; }
+.emptyState { min-height: calc(100svh - 83px); padding: 12vh 9vw; box-sizing: border-box; text-align: left; background: radial-gradient(circle at 75% 25%, #263429 0, transparent 35%), #111412; }
+.emptyStateNumber { color: #b8e56d; font: 12px ui-monospace, monospace; }
+.emptyState h2 { max-width: 560px; margin: 18px 0 10px; color: #edf3ee; font: 400 clamp(42px, 7vw, 86px)/.95 Georgia, serif; letter-spacing: -3px; }
+.emptyState p { max-width: 360px; color: #98a79b; font-size: 15px; }
+.workspaceLayout { display: flex; height: calc(100svh - 82px); min-height: 0; }
+.workspaceLayout > .editorPanel, .workspaceLayout > .patternPlaylist { min-width: 0; }
+.workspaceLayout > .patternPlaylist { flex: 0 0 300px; height: 100%; }
+.workspaceLayout > .editorPanel { flex: 1; }
+.workspaceLayout > .arrangementPanel { min-width: 0; flex: 1; margin: 18px 32px 0 0; height: calc(100% - 18px); }
+@media (max-width: 620px) { .topBar { padding: 10px 18px; align-items: flex-start; } .brandBlock h1 { font-size: 18px; } .viewSwitcher button { padding: 7px 8px; font-size: 9px; } .studioControls { gap: 7px; margin-left: 10px; flex-direction: column; align-items: flex-start; } .patternSelectControl select { max-width: 115px; padding: 6px; font-size: 10px; } .bpmSelectControl input { padding: 6px; } .editorToggle { padding: 11px; font-size: 10px; } .emptyState { padding: 15vh 28px; } }
+@media (max-width: 700px) { .workspaceLayout { display: block; height: calc(100svh - 82px); overflow: auto; } .workspaceLayout > .patternPlaylist { width: 100%; height: auto; } .workspaceLayout > .arrangementPanel { margin-left: 14px; } }

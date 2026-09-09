@@ -1,0 +1,30 @@
+.editorPanel { display: flex; min-width: 0; height: calc(100svh - 82px); min-height: 0; padding: 20px 32px 32px; flex-direction: column; background: #111412; overflow: hidden; }
+.editorToolbar { min-height: 56px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; border-bottom: 1px solid #2a312c; }
+.transportControls { display: flex; gap: 6px; }
+.transportButton { padding: 10px 13px; }
+.transportButton.primary { border-color: #b8e56d; color: #172016; background: #b8e56d; }
+.transportButton:disabled { cursor: default; opacity: .38; }
+.numberControl, .volumeControl { display: flex; align-items: center; gap: 8px; color: #849288; font: 11px ui-monospace, monospace; }
+.numberControl input { width: 58px; padding: 7px; border: 1px solid #374238; border-radius: 2px; color: #e8eee9; background: #1d241e; }
+.volumeControl input { accent-color: #b8e56d; }
+.hintText { margin-left: auto; color: #647168; font: 11px ui-monospace, monospace; }
+.seekBarRow { height: 38px; display: flex; color: #6c7b70; font: 10px ui-monospace, monospace; }
+.seekBarLabel { flex: 0 0 auto; padding-top: 12px; }
+.seekBar { position: relative; flex: 1 0 1800px; overflow: hidden; border-left: 1px solid #39463c; border-bottom: 1px solid #39463c; background: repeating-linear-gradient(to right, #202920 0, #202920 59px, #334035 60px); cursor: pointer; }
+.seekMarker, .playhead { position: absolute; left: 0; z-index: 3; width: 2px; background: #b8e56d; box-shadow: 0 0 9px #b8e56d; pointer-events: none; will-change: transform; }
+.seekMarker { top: 0; height: 100%; }
+.seekBeat { position: absolute; top: 10px; color: #748377; }
+.rollViewport { display: flex; min-width: 0; min-height: 0; flex: 1; overflow: auto; border: 1px solid #2a312c; border-top: 0; overscroll-behavior: contain; }
+.keyboardLabels { position: sticky; left: 0; z-index: 4; flex: 0 0 80px; background: #151b16; }
+.keyLabel { height: 22px; padding: 5px 8px; border-bottom: 1px solid #d4dbd4; color: #273028; background: #e8eee8; font: 10px ui-monospace, monospace; text-align: left; }
+.keyLabel.blackKey { border-bottom-color: #273029; color: #dae4dc; background: #252d27; }
+.pianoRoll { position: relative; flex: 0 0 auto; overflow: hidden; }
+.gridRow { position: absolute; width: 100%; border-bottom: 1px solid #313c33; background: #263128; pointer-events: none; }
+.gridRow.darkRow { background: #1c241e; }
+.beatLine { position: absolute; z-index: 1; top: 0; width: 1px; height: 100%; background: #354239; pointer-events: none; }
+.beatLine.barLine { width: 2px; background: #536254; }
+.placedNote { position: absolute; z-index: 2; border: 1px solid #d5f99c; border-radius: 2px; background: #9bc95d; cursor: grab; }
+.placedNote:active { cursor: grabbing; }
+.placedNote.triggered { background: #f0bc64; border-color: #ffe0a1; }
+.playhead { top: 0; height: 100%; }
+@media (max-width: 700px) { .editorPanel { height: calc(100svh - 82px); padding: 12px 14px 20px; } .hintText { flex-basis: 100%; margin: 0 0 10px; } .editorToolbar { gap: 10px; padding-bottom: 12px; } }

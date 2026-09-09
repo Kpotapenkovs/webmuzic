@@ -1,0 +1,32 @@
+.arrangementPanel { display: flex; min-height: 0; flex-direction: column; border: 1px solid #2f3a31; background: #171d18; text-align: left; }
+.arrangementHeader { min-height: 67px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #2a312c; }
+.arrangementHeader h2 { margin: 5px 0 0; color: #edf3ee; font: 400 23px/1 Georgia, serif; }
+.arrangementActions { display: flex; gap: 14px; align-items: center; color: #718073; font: 10px ui-monospace, monospace; }
+.arrangementPlay { padding: 9px 12px; border: 1px solid #b8e56d; border-radius: 3px; color: #172016; background: #b8e56d; cursor: pointer; font: 600 11px ui-monospace, monospace; }
+.arrangementBody { display: flex; min-height: 0; flex: 1; }
+.arrangementSources { width: 230px; flex: 0 0 230px; padding: 12px; border-right: 1px solid #2a312c; }
+.sourceLabel { display: block; margin: 0 4px 8px; color: #68766c; font: 9px ui-monospace, monospace; }
+.sourcePattern { width: 100%; padding: 7px 5px; display: flex; gap: 7px; align-items: center; border: 0; color: #b8c4b9; background: transparent; cursor: grab; font-size: 11px; text-align: left; }
+.sourcePattern:hover, .sourcePattern.selected { color: #e8f0e9; background: #263127; }
+.sourcePattern i { width: 7px; height: 7px; border-radius: 1px; background: #9bc95d; }
+.sourcePattern small { margin-left: auto; color: #718073; font: 9px ui-monospace, monospace; }
+.timelineScroll { min-width: 0; min-height: 0; overflow: auto; flex: 1; overscroll-behavior: contain; }
+.timelineScale, .arrangementGrid { position: relative; min-width: 15600px; }
+.timelineScale { height: 27px; display: grid; grid-template-columns: repeat(300, 52px); border-bottom: 1px solid #2f3a31; color: #718073; font: 9px ui-monospace, monospace; user-select: none; }
+.timelineScale span { padding: 7px 5px; border-right: 1px solid #2b382e; user-select: none; }
+.arrangementGrid { height: 768px; display: grid; grid-template-columns: repeat(300, 52px); background: #1c241e; }
+.arrangementGrid > span { border-right: 1px solid #2b382e; }
+.arrangementGrid > span.bar { border-right-color: #526254; }
+.trackLane { position: absolute; left: 0; right: 0; z-index: 1; height: 64px; padding: 5px 7px; border-top: 1px solid #354239; color: #68766c; font: 9px ui-monospace, monospace; pointer-events: none; }
+.trackLane span { position: sticky; left: 7px; }
+.arrangementClip { position: absolute; z-index: 2; height: 50px; overflow: hidden; padding: 8px; display: flex; flex-direction: column; align-items: flex-start; border: 1px solid #9bc95d; border-radius: 3px; color: #172016; background: #9bc95d; cursor: grab; text-align: left; }
+.arrangementClip.selected { border-color: #f0bc64; background: #f0bc64; }
+.arrangementClip.dragging { z-index: 5; border-color: #f7ffd8; background: #c9f477; box-shadow: 0 0 0 3px rgba(184, 229, 109, .28), 0 10px 24px rgba(0, 0, 0, .45); cursor: grabbing; filter: saturate(1.25) brightness(1.08); }
+.arrangementGrid:has(.arrangementClip.dragging) .arrangementClip:not(.dragging) { opacity: .58; }
+.arrangementClip strong { overflow: hidden; max-width: 100%; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.arrangementClip small { margin-top: 5px; font: 9px ui-monospace, monospace; opacity: .7; }
+.clipDelete { position: absolute; top: 4px; right: 5px; color: #34452e; font: 16px/1 sans-serif; cursor: pointer; }
+.clipDelete:hover { color: #172016; }
+.arrangementPlayhead { position: absolute; top: 0; bottom: 0; z-index: 3; width: 8px; margin-left: -3px; background: #b8e56d; box-shadow: 0 0 9px #b8e56d; cursor: ew-resize; }
+.arrangementHint { margin: 0; padding: 8px 18px; border-top: 1px solid #2a312c; color: #647168; font: 10px ui-monospace, monospace; }
+@media (max-width: 700px) { .arrangementPanel { height: auto; margin: 12px 14px 0; } .arrangementHeader { align-items: flex-start; } .arrangementSources { width: 150px; flex-basis: 150px; } .arrangementActions { flex-direction: column; gap: 6px; align-items: flex-end; } }
