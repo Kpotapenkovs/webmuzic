@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\fr;
 use Illuminate\Http\Request;
 
-class SignupControllerController extends Controller
+class SignupController extends Controller
 {
-     /**
+    /**
      * Display a listing of the resource.
      */
     public function index()

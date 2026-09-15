@@ -8,19 +8,33 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
   const positionRef = useRef(0);
   const lastBeatRef = useRef(-1);
   const bpmRef = useRef(bpm);
-  const patternsRef = useRef(patterns);
-  const arrangementRef = useRef(arrangement);
+  const playbackDataRef = useRef({ end: 0, notesByBeat: new Map() });
 
   useEffect(() => {
     bpmRef.current = bpm;
   }, [bpm]);
 
   useEffect(() => {
-    patternsRef.current = patterns;
-    arrangementRef.current = arrangement;
+    const patternsById = new Map(patterns.map((pattern) => [pattern.id, pattern]));
+    const notesByBeat = new Map();
+    let end = 0;
+
+    arrangement.forEach((clip) => {
+      const pattern = patternsById.get(clip.patternId);
+      end = Math.max(end, clip.startBeat + getPatternLength(pattern));
+
+      pattern?.notes.forEach((note) => {
+        const beat = clip.startBeat + note.beat;
+        const notes = notesByBeat.get(beat) ?? [];
+        notes.push(note);
+        notesByBeat.set(beat, notes);
+      });
+    });
+
+    playbackDataRef.current = { end, notesByBeat };
   }, [patterns, arrangement]);
 
-  const getEnd = () => Math.max(0, ...arrangementRef.current.map((clip) => clip.startBeat + getPatternLength(patternsRef.current.find((pattern) => pattern.id === clip.patternId))));
+  const getEnd = () => playbackDataRef.current.end;
 
   const stop = () => {
     cancelAnimationFrame(frameRef.current);
@@ -60,10 +74,7 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
       lastBeatRef.current = beat;
 
       function playBeat(beatToPlay) {
-        arrangementRef.current.forEach((clip) => {
-          const pattern = patternsRef.current.find((item) => item.id === clip.patternId);
-          pattern?.notes.filter((note) => clip.startBeat + note.beat === beatToPlay).forEach((note) => onNotePlay(note.row));
-        });
+        playbackDataRef.current.notesByBeat.get(beatToPlay)?.forEach((note) => onNotePlay(note.row));
       }
       positionRef.current = currentPosition;
       setPosition(currentPosition);
