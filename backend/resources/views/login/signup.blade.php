@@ -1,49 +1,48 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="lv">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Reģistrēties</title>
 </head>
 <body>
-<h1>Reģistrēties</h1>
+    <h1>Reģistrēties</h1>
 
-<form method="POST">
+    <form method="POST" action="{{ route('signup.store') }}">
+        @csrf
 
-  <label>
+        <div>
+            <label for="username">Lietotājvārds</label>
+            <input id="username" type="text" name="username" value="{{ old('username') }}" autocomplete="username" required autofocus>
+            @error('username')
+                <p>{{ $message }}</p>
+            @enderror
+        </div>
 
-  @csrf
+        <div>
+            <label for="email">E-pasts</label>
+            <input id="email" type="email" name="email" value="{{ old('email') }}" autocomplete="email" required>
+            @error('email')
+                <p>{{ $message }}</p>
+            @enderror
+        </div>
 
-  @if ($errors->any())
-    <ul>
-      @foreach ($errors->all() as $error)
-          <li>{{ $error }}</li>
-      @endforeach
-    </ul>
-  @endif
+        <div>
+            <label for="password">Parole</label>
+            <input id="password" type="password" name="password" autocomplete="new-password" required>
+            @error('password')
+                <p>{{ $message }}</p>
+            @enderror
+        </div>
 
-  <p>lietotājvārds: </p><input type="text" name="username" required>
+        <div>
+            <label for="password_confirmation">Apstipriniet paroli</label>
+            <input id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" required>
+        </div>
 
-  <br>
-  <br>
+        <button type="submit">Reģistrēties</button>
+    </form>
 
-  <p>parole: </p><input type="password" name="password" required>
-
-  <br>
-
-  <br>
-  <p>paroles pastiprināšana: </p><input type="password" name="password_confirmation" required>
-
-  <br>
-  <br>
-
-  <button type="submit">reģistrēties</button>
-
-  </label>
-
-</form>
-
-
+    <p>Jau ir konts? <a href="{{ route('login.index') }}">Pieslēgties</a></p>
 </body>
 </html>

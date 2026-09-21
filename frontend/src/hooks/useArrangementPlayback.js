@@ -48,7 +48,7 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
     setIsPlaying(false);
   };
   const seek = (nextPosition) => {
-    const position = Math.max(0, Math.min(getEnd(), nextPosition));
+    const position = Math.max(0, Math.min(300, nextPosition));
     positionRef.current = position;
     lastBeatRef.current = -1;
     setPosition(position);
@@ -56,6 +56,11 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
   const start = () => {
     cancelAnimationFrame(frameRef.current);
     if (!getEnd()) return;
+    if (positionRef.current >= getEnd()) {
+      positionRef.current = 0;
+      lastBeatRef.current = -1;
+      setPosition(0);
+    }
     setIsPlaying(true);
     let previousTime;
     const animate = (time) => {

@@ -27,6 +27,6 @@
 .arrangementClip small { margin-top: 5px; font: 9px ui-monospace, monospace; opacity: .7; }
 .clipDelete { position: absolute; top: 4px; right: 5px; color: #34452e; font: 16px/1 sans-serif; cursor: pointer; }
 .clipDelete:hover { color: #172016; }
-.arrangementPlayhead { position: absolute; top: 0; bottom: 0; z-index: 3; width: 8px; margin-left: -3px; background: #b8e56d; box-shadow: 0 0 9px #b8e56d; cursor: ew-resize; }
+.arrangementPlayhead { position: absolute; top: 0; bottom: 0; z-index: 3; width: 8px; margin-left: -3px; background: #b8e56d; box-shadow: 0 0 9px #b7e56d85; cursor: ew-resize; }
 .arrangementHint { margin: 0; padding: 8px 18px; border-top: 1px solid #2a312c; color: #647168; font: 10px ui-monospace, monospace; }
 @media (max-width: 700px) { .arrangementPanel { height: auto; margin: 12px 14px 0; } .arrangementHeader { align-items: flex-start; } .arrangementSources { width: 150px; flex-basis: 150px; } .arrangementActions { flex-direction: column; gap: 6px; align-items: flex-end; } }

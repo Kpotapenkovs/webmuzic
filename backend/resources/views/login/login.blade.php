@@ -1,29 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="lv">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Pieslēgties</title>
 </head>
 <body>
+    <h1>Pieslēgties</h1>
 
-<h1>login</h1>
+    <form method="POST" action="{{ route('login.store') }}">
+        @csrf
 
-    <form method="POST" action="/">
+        <div>
+            <label for="email">E-pasts</label>
+            <input id="email" type="email" name="email" value="{{ old('email') }}" autocomplete="email" required autofocus>
+            @error('email')
+                <p>{{ $message }}</p>
+            @enderror
+        </div>
 
-    @csrf 
+        <div>
+            <label for="password">Parole</label>
+            <input id="password" type="password" name="password" autocomplete="current-password" required>
+            @error('password')
+                <p>{{ $message }}</p>
+            @enderror
+        </div>
 
-    @if ($errors->any())
-    <ul>
-      @foreach ($errors->all() as $error)
-          <li>{{ $error }}</li>
-      @endforeach
-    </ul>
-  @endif
-
-    lietotājvārds:<input type="text" name="username" required>
-    parole:<input type="password" name="password" required>
-    <button>pieslēgties</button>
+        <button type="submit">Pieslēgties</button>
     </form>
+
+    <p>Vēl nav konta? <a href="{{ route('signup.index') }}">Reģistrēties</a></p>
 </body>
 </html>

@@ -2,64 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\fr;
-use Illuminate\Http\Request;
+use App\Http\Requests\LoginRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class LoginController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): View
     {
-        return view('login.index');
+        return view('login.login');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(LoginRequest $request): RedirectResponse
     {
-        //
-    }
+        if (! Auth::attempt($request->validated())) {
+            return back()
+                ->withErrors(['email' => 'Norādītais e-pasts vai parole nav pareiza.'])
+                ->onlyInput('email');
+        }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $request->session()->regenerate();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(fr $fr)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(fr $fr)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, fr $fr)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(fr $fr)
-    {
-        //
+        return redirect()->intended(route('home', absolute: false));
     }
 }

@@ -28,9 +28,9 @@
 .brandBlock h1 { margin: 6px 0 0; color: #edf3ee; font: 600 21px/1.1 Georgia, serif; letter-spacing: 0; }
 .editorToggle, .transportButton { border: 1px solid #3a463e; border-radius: 3px; color: #dce8df; background: #202720; cursor: pointer; font: 600 12px/1 ui-monospace, monospace; }
 .editorToggle { padding: 13px 16px; display: flex; gap: 9px; align-items: center; }
-.editorToggle:hover, .editorToggle.isActive { border-color: #b8e56d; color: #c9f58b; }
+.editorToggle:hover, .editorToggle.isActive { border-color: #b7e56d6c; color: #c9f58b; }
 .toggleDot { width: 7px; height: 7px; border-radius: 50%; background: #90a294; }
-.isActive .toggleDot { background: #b8e56d; box-shadow: 0 0 10px #b8e56d; }
+.isActive .toggleDot { background: #b7e56d5e; box-shadow: 0 0 10px #b8e56d; }
 .emptyState { min-height: calc(100svh - 83px); padding: 12vh 9vw; box-sizing: border-box; text-align: left; background: radial-gradient(circle at 75% 25%, #263429 0, transparent 35%), #111412; }
 .emptyStateNumber { color: #b8e56d; font: 12px ui-monospace, monospace; }
 .emptyState h2 { max-width: 560px; margin: 18px 0 10px; color: #edf3ee; font: 400 clamp(42px, 7vw, 86px)/.95 Georgia, serif; letter-spacing: -3px; }
