@@ -2,64 +2,49 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\fr;
+use App\Http\Requests\StoreProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
+use App\Models\Project;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ProjectController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request): View
     {
-        //
+        return view('projects', [
+            'projects' => $request->user()->projects()->latest()->get(),
+            'frontendUrl' => config('services.frontend.url'),
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show(Request $request, Project $project): JsonResponse
     {
-        //
+        return response()->json([
+            'project' => $this->userProject($request, $project),
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request): JsonResponse
     {
-        //
+        $project = $request->user()->projects()->create(
+            $request->safe()->only(['title', 'data']),
+        );
+
+        return response()->json(['project' => $project], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(fr $fr)
+    public function update(UpdateProjectRequest $request, Project $project): JsonResponse
     {
-        //
+        $project = $this->userProject($request, $project);
+        $project->update($request->safe()->only(['title', 'data']));
+
+        return response()->json(['project' => $project]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(fr $fr)
+    private function userProject(Request $request, Project $project): Project
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, fr $fr)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(fr $fr)
-    {
-        //
+        return $request->user()->projects()->findOrFail($project->getKey());
     }
 }

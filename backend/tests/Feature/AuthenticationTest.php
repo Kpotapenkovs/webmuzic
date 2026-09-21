@@ -92,4 +92,47 @@ class AuthenticationTest extends TestCase
         $response->assertSessionHasErrors(['email']);
         $this->assertGuest();
     }
+
+    public function test_login_can_redirect_user_back_to_the_studio(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'janis@example.test',
+            'password' => Hash::make('secret-password'),
+        ]);
+
+        $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'secret-password',
+            'return_to' => 'studio',
+        ])->assertRedirect(config('services.frontend.url'));
+    }
+
+    public function test_authenticated_user_can_get_their_session_profile(): void
+    {
+        $user = User::factory()->create(['username' => 'janis']);
+
+        $this->actingAs($user)
+            ->getJson(route('session.user'))
+            ->assertExactJson([
+                'user' => [
+                    'username' => 'janis',
+                ],
+            ]);
+    }
+
+    public function test_guest_session_profile_request_returns_unauthorized(): void
+    {
+        $this->getJson(route('session.user'))->assertUnauthorized();
+    }
+
+    public function test_authenticated_user_can_log_out_of_their_session(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->postJson(route('session.logout'))
+            ->assertNoContent();
+
+        $this->assertGuest();
+    }
 }

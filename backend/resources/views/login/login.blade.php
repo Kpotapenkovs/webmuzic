@@ -10,6 +10,7 @@
 
     <form method="POST" action="{{ route('login.store') }}">
         @csrf
+        <input type="hidden" name="return_to" value="{{ old('return_to', request('return_to')) }}">
 
         <div>
             <label for="email">E-pasts</label>

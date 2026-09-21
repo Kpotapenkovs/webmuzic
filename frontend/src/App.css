@@ -15,6 +15,17 @@
   background: #171b18;
 }
 .studioControls { display: flex; gap: 14px; align-items: center; margin-left: 14px; }
+.accountControls { display: flex; gap: 10px; align-items: center; margin-left: auto; }
+.saveButton, .accountButton { padding: 10px 12px; border: 1px solid #3a463e; border-radius: 3px; color: #dce8df; background: #202720; cursor: pointer; font: 600 11px/1 ui-monospace, monospace; text-decoration: none; }
+.saveButton { color: #172016; border-color: #b8e56d; background: #b8e56d; }
+.saveButton:hover { background: #c9f58b; }
+.saveButton:disabled { cursor: wait; opacity: .65; }
+.accountButton:hover { border-color: #b7e56d6c; color: #c9f58b; }
+.accountMenu { position: relative; }
+.userName { display: flex; align-items: center; gap: 5px; cursor: pointer; color: #b8e56d; font: 600 11px ui-monospace, monospace; list-style: none; }
+.userName::-webkit-details-marker { display: none; }
+.accountMenuPanel { position: absolute; right: 0; z-index: 5; top: calc(100% + 8px); display: grid; min-width: 158px; gap: 4px; padding: 4px; border: 1px solid #3a463e; border-radius: 3px; background: #202720; box-shadow: 0 14px 28px #00000059; }
+.accountMenuPanel .accountButton { width: 100%; text-align: left; }
 .viewSwitcher { display: flex; padding: 2px; border: 1px solid #3a463e; border-radius: 3px; background: #202720; }
 .viewSwitcher button { padding: 9px 11px; border: 0; color: #8c9b8f; background: transparent; cursor: pointer; font: 600 11px ui-monospace, monospace; }
 .viewSwitcher button:hover, .viewSwitcher button.active { color: #172016; background: #b8e56d; }
@@ -40,5 +51,5 @@
 .workspaceLayout > .patternPlaylist { flex: 0 0 300px; height: 100%; }
 .workspaceLayout > .editorPanel { flex: 1; }
 .workspaceLayout > .arrangementPanel { min-width: 0; flex: 1; margin: 18px 32px 0 0; height: calc(100% - 18px); }
-@media (max-width: 620px) { .topBar { padding: 10px 18px; align-items: flex-start; } .brandBlock h1 { font-size: 18px; } .viewSwitcher button { padding: 7px 8px; font-size: 9px; } .studioControls { gap: 7px; margin-left: 10px; flex-direction: column; align-items: flex-start; } .patternSelectControl select { max-width: 115px; padding: 6px; font-size: 10px; } .bpmSelectControl input { padding: 6px; } .editorToggle { padding: 11px; font-size: 10px; } .emptyState { padding: 15vh 28px; } }
+@media (max-width: 760px) { .topBar { padding: 10px 18px; align-items: flex-start; flex-wrap: wrap; } .brandBlock h1 { font-size: 18px; } .viewSwitcher button { padding: 7px 8px; font-size: 9px; } .studioControls { gap: 7px; margin-left: 10px; flex-direction: column; align-items: flex-start; } .accountControls { margin-left: auto; } .patternSelectControl select { max-width: 115px; padding: 6px; font-size: 10px; } .bpmSelectControl input { padding: 6px; } .editorToggle { padding: 11px; font-size: 10px; } .emptyState { padding: 15vh 28px; } }
 @media (max-width: 700px) { .workspaceLayout { display: block; height: calc(100svh - 82px); overflow: auto; } .workspaceLayout > .patternPlaylist { width: 100%; height: auto; } .workspaceLayout > .arrangementPanel { margin-left: 14px; } }

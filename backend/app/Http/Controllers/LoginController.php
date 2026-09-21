@@ -16,14 +16,23 @@ class LoginController extends Controller
 
     public function store(LoginRequest $request): RedirectResponse
     {
-        if (! Auth::attempt($request->validated())) {
+        $validated = $request->validated();
+
+        if (! Auth::attempt([
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+        ])) {
             return back()
                 ->withErrors(['email' => 'Norādītais e-pasts vai parole nav pareiza.'])
-                ->onlyInput('email');
+                ->onlyInput('email', 'return_to');
         }
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('home', absolute: false));
+        $fallbackUrl = ($validated['return_to'] ?? null) === 'studio'
+            ? config('services.frontend.url')
+            : route('home', absolute: false);
+
+        return redirect()->intended($fallbackUrl);
     }
 }

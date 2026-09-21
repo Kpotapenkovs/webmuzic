@@ -21,6 +21,8 @@ export default function useStudioWorkspace() {
     addToArrangement,
     moveInArrangement,
     removeFromArrangement,
+    loadProject: loadPatternProject,
+    markSaved,
   } = patternStorage;
   const selectedPattern = patterns.find((pattern) => pattern.id === selectedPatternId) || patterns[0];
   const playNote = useNoteSound(DEFAULT_NOTE_VOLUME);
@@ -52,6 +54,12 @@ export default function useStudioWorkspace() {
     setIsPianoRollOpen(false);
   };
   const openPianoRoll = () => setIsPianoRollOpen(true);
+
+  const loadProject = (projectData) => {
+    setBpm(Math.max(MIN_BPM, Math.min(MAX_BPM, Number(projectData.bpm) || DEFAULT_BPM)));
+    loadPatternProject(projectData);
+    setIsPianoRollOpen(false);
+  };
 
   const startPlayback = () => {
     if (isPianoRollOpen) {
@@ -106,5 +114,7 @@ export default function useStudioWorkspace() {
     addToArrangement,
     moveInArrangement,
     removeFromArrangement,
+    loadProject,
+    markSaved,
   };
 }

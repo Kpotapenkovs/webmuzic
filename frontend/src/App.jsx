@@ -2,10 +2,16 @@ import PianoRollEditor from "./components/PianoRollEditor";
 import PatternPlaylist from "./components/PatternPlaylist";
 import ArrangementTimeline from "./components/ArrangementTimeline";
 import useStudioWorkspace from "./hooks/useStudioWorkspace";
+import useSessionUser from "./hooks/useSessionUser";
+import useProjectPersistence from "./hooks/useProjectPersistence";
 import "./App.css";
+
+const backendUrl = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000";
 
 export default function App() {
   const workspace = useStudioWorkspace();
+  const { isLoading: isSessionLoading, user, logout } = useSessionUser();
+  const { isLoading: isProjectLoading, isSaving, save } = useProjectPersistence(workspace);
   const {
     isPianoRollOpen,
     bpm,
@@ -32,6 +38,22 @@ export default function App() {
     moveInArrangement,
     removeFromArrangement,
   } = workspace;
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      window.alert(error.message);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      await save();
+    } catch (error) {
+      window.alert(error.message);
+    }
+  };
 
   return (
     <div className="appShell">
@@ -60,6 +82,22 @@ export default function App() {
             <span>BPM</span>
             <input type="number" min="40" max="240" value={bpm} onChange={(event) => handleBpmChange(Number(event.target.value))} />
           </label>
+        </div>
+        <div className="accountControls">
+          <button className="saveButton" type="button" onClick={handleSave} disabled={isSaving || isProjectLoading}>
+            {isSaving ? "Saving..." : "Save"}
+          </button>
+          {isSessionLoading ? null : user ? (
+            <details className="accountMenu">
+              <summary className="userName">{user.username}<span aria-hidden="true">⌄</span></summary>
+              <div className="accountMenuPanel">
+                <a className="accountButton" href={backendUrl}>Saglabātie projekti</a>
+                <button className="accountButton" type="button" onClick={handleLogout}>Iziet</button>
+              </div>
+            </details>
+          ) : (
+            <a className="accountButton" href="/login?return_to=studio">Pieslēgties</a>
+          )}
         </div>
       </header>
 
