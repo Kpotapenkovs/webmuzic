@@ -2,6 +2,8 @@ import { useRef } from "react";
 
 export default function useNoteSound(volume) {
   const audioContextRef = useRef(null);
+  const volumeRef = useRef(volume);
+  volumeRef.current = volume;
 
   return (row) => {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -19,7 +21,7 @@ export default function useNoteSound(volume) {
     oscillator.type = "sine";
     oscillator.frequency.value = 440 * Math.pow(2, (midi - 69) / 12);
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.2 * volume, now + 0.01);
+    gain.gain.linearRampToValueAtTime(0.2 * volumeRef.current, now + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
 
     oscillator.connect(gain);

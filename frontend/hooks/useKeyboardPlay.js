@@ -9,10 +9,14 @@ const KEY_MAP = {
   "9": 25, o: 26, "0": 27, p: 28, "[": 29, "=": 30, "]": 31,
 };
 
-export default function useKeyboardPlay({ onNoteOn, onNoteOff }) {
+export default function useKeyboardPlay({ onNoteOn, onNoteOff, volume = 1 }) {
   const audioCtxRef = useRef(null);
   const activeNotes = useRef({});
   const pressed = useRef(new Set());
+  const volumeRef = useRef(volume);
+  const callbacksRef = useRef({ onNoteOn, onNoteOff });
+  volumeRef.current = volume;
+  callbacksRef.current = { onNoteOn, onNoteOff };
 
   useEffect(() => {
     if (!audioCtxRef.current) {
@@ -36,6 +40,7 @@ export default function useKeyboardPlay({ onNoteOn, onNoteOff }) {
 
       const note = KEY_MAP[key];
       if (note === undefined) return;
+      e.preventDefault();
 
       pressed.current.add(key);
 
@@ -50,7 +55,7 @@ export default function useKeyboardPlay({ onNoteOn, onNoteOff }) {
       osc.frequency.setValueAtTime(getFrequency(note), ctx.currentTime);
 
       gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.125, ctx.currentTime + 0.01);
+      gain.gain.linearRampToValueAtTime(0.25 * volumeRef.current, ctx.currentTime + 0.01);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
@@ -59,15 +64,14 @@ export default function useKeyboardPlay({ onNoteOn, onNoteOff }) {
 
       activeNotes.current[key] = { osc, gain };
 
-      if (onNoteOn) {
-        onNoteOn(note);
-      }
+      callbacksRef.current.onNoteOn?.(note);
     };
 
     const handleKeyUp = (e) => {
       const key = e.key.toLowerCase();
       const note = KEY_MAP[key];
       if (note === undefined) return;
+      e.preventDefault();
 
       pressed.current.delete(key);
 
@@ -85,31 +89,35 @@ export default function useKeyboardPlay({ onNoteOn, onNoteOff }) {
 
       delete activeNotes.current[key];
 
-      if (onNoteOff) {
-        onNoteOff(note);
-      }
+      callbacksRef.current.onNoteOff?.(note);
     };
 
-    const handleBlur = () => {
-      Object.values(activeNotes.current).forEach(({ osc, gain }) => {
+    const releaseActiveNotes = () => {
+      Object.entries(activeNotes.current).forEach(([key, { osc, gain }]) => {
         try {
-          gain.gain.setValueAtTime(0, ctx.currentTime);
-          osc.stop();
+          const now = ctx.currentTime;
+          gain.gain.cancelScheduledValues(now);
+          gain.gain.setValueAtTime(gain.gain.value, now);
+          gain.gain.linearRampToValueAtTime(0, now + 0.03);
+          osc.stop(now + 0.04);
         } catch {}
+        callbacksRef.current.onNoteOff?.(KEY_MAP[key]);
       });
-
       activeNotes.current = {};
       pressed.current.clear();
     };
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
-    window.addEventListener("blur", handleBlur);
+    window.addEventListener("blur", releaseActiveNotes);
+    document.addEventListener("visibilitychange", releaseActiveNotes);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
-      window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("blur", releaseActiveNotes);
+      document.removeEventListener("visibilitychange", releaseActiveNotes);
+      releaseActiveNotes();
     };
-  }, [onNoteOn, onNoteOff]);
+  }, []);
 }

@@ -16,6 +16,8 @@ export default function App() {
   const {
     isPianoRollOpen,
     bpm,
+    volume,
+    setVolume,
     selectedPattern,
     patterns,
     selectedPatternId,
@@ -152,6 +154,8 @@ export default function App() {
             onNotesChange={(notes) => !isReadOnly && updatePatternNotes(selectedPattern.id, notes)}
             playback={pianoRollPlayback}
             readOnly={isReadOnly}
+            volume={volume}
+            onVolumeChange={setVolume}
           />
         ) : (
           <ArrangementTimeline

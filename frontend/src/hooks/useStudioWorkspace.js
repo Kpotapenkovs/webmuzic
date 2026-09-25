@@ -8,6 +8,7 @@ import { DEFAULT_BPM, DEFAULT_NOTE_VOLUME, MAX_BPM, MIN_BPM } from "../config/st
 export default function useStudioWorkspace() {
   const [isPianoRollOpen, setIsPianoRollOpen] = useState(false);
   const [bpm, setBpm] = useState(DEFAULT_BPM);
+  const [volume, setVolume] = useState(DEFAULT_NOTE_VOLUME);
   const patternStorage = usePatternStorage();
   const {
     patterns,
@@ -26,7 +27,7 @@ export default function useStudioWorkspace() {
     markSaved,
   } = patternStorage;
   const selectedPattern = patterns.find((pattern) => pattern.id === selectedPatternId) || patterns[0];
-  const playNote = useNoteSound(DEFAULT_NOTE_VOLUME);
+  const playNote = useNoteSound(volume);
   const [activeBeat, setActiveBeat] = useState(-1);
   const pianoRollPlayback = usePianoRoll({
     bpm,
@@ -93,6 +94,8 @@ export default function useStudioWorkspace() {
   return {
     isPianoRollOpen,
     bpm,
+    volume,
+    setVolume,
     selectedPattern,
     patterns,
     selectedPatternId,

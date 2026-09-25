@@ -8,10 +8,7 @@ const CELL_HEIGHT = 22;
 const CELL_WIDTH = 60;
 const TOTAL_BEATS = 300;
 const KEYBOARD_WIDTH = 80;
-const DEFAULT_VOLUME = 0.5;
-
-export default function PianoRollEditor({ notes, onNotesChange, playback, readOnly = false }) {
-  const [volume, setVolume] = useState(DEFAULT_VOLUME);
+export default function PianoRollEditor({ notes, onNotesChange, playback, volume = 0.5, onVolumeChange = () => {}, readOnly = false }) {
   const [selectedNotes, setSelectedNotes] = useState([]);
   const [clipboard, setClipboard] = useState([]);
   const [selectionBox, setSelectionBox] = useState(null);
@@ -102,7 +99,7 @@ export default function PianoRollEditor({ notes, onNotesChange, playback, readOn
   return (
     <main className="editorPanel">
       <section className="editorToolbar" aria-label="Piano roll controls">
-        <label className="volumeControl"><span>Volume {Math.round(volume * 100)}%</span><input type="range" min="0" max="1" step="0.01" value={volume} onChange={(event) => setVolume(Number(event.target.value))} /></label>
+        <label className="volumeControl"><span>Volume {Math.round(volume * 100)}%</span><input type="range" min="0" max="1" step="0.01" value={volume} onChange={(event) => onVolumeChange(Number(event.target.value))} /></label>
         <span className="hintText">Klikšķis: pievienot · velciet fonā: izcelt · Ctrl+A: visas · Ctrl+C/V: kopēt/ielīmēt</span>
       </section>
       <SeekBar playheadX={playheadX} setPlayheadX={setPlayheadX} seekMarkerRef={seekMarkerRef} keyboardWidth={KEYBOARD_WIDTH} totalWidth={totalWidth} />
