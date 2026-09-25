@@ -7,7 +7,7 @@ export default function usePianoRoll({ bpm, cellWidth, totalBeats, gridRows, not
   const animationRef = useRef(null);
   const playheadRef = useRef(0);
   const notesRef = useRef(notes);
-  const lastBeatRef = useRef(-1);
+  const lastStepRef = useRef(-1);
   const bpmRef = useRef(bpm);
   const onPlayheadChangeRef = useRef(onPlayheadChange);
   const onBeatChangeRef = useRef(onBeatChange);
@@ -32,25 +32,26 @@ export default function usePianoRoll({ bpm, cellWidth, totalBeats, gridRows, not
   const start = () => {
     cancelAnimationFrame(animationRef.current);
     setIsPlaying(true);
-    lastBeatRef.current = -1;
+    lastStepRef.current = -1;
     let previousTime;
     const animate = (time) => {
       const delta = previousTime ? time - previousTime : 0;
       previousTime = time;
       const nextPosition = playheadRef.current + (cellWidth * bpmRef.current * delta) / 60000;
       const next = nextPosition >= loopEnd() ? 0 : nextPosition;
-      const beat = Math.floor(next / cellWidth);
+      const step = Math.floor(next / (cellWidth / 2));
+      const beat = Math.floor(step / 2);
+      const playStep = (stepToPlay) => {
+        notesRef.current.filter((note) => Math.round(note.beat * 2) === stepToPlay).forEach((note) => onNotePlay?.(note.row));
+        if (stepToPlay % 2 === 0) onBeatChangeRef.current?.(stepToPlay / 2);
+      };
 
-      if (lastBeatRef.current < 0 || beat < lastBeatRef.current) {
-        onBeatChangeRef.current?.(beat);
-        notesRef.current.filter((note) => note.beat === beat).forEach((note) => onNotePlay?.(note.row));
-      } else if (beat > lastBeatRef.current) {
-        for (let crossedBeat = lastBeatRef.current + 1; crossedBeat <= beat; crossedBeat += 1) {
-          onBeatChangeRef.current?.(crossedBeat);
-          notesRef.current.filter((note) => note.beat === crossedBeat).forEach((note) => onNotePlay?.(note.row));
-        }
+      if (lastStepRef.current < 0 || step < lastStepRef.current) {
+        playStep(step);
+      } else if (step > lastStepRef.current) {
+        for (let crossedStep = lastStepRef.current + 1; crossedStep <= step; crossedStep += 1) playStep(crossedStep);
       }
-      lastBeatRef.current = beat;
+      lastStepRef.current = step;
 
       playheadRef.current = next;
       setPlayheadX(next);
@@ -74,27 +75,28 @@ export default function usePianoRoll({ bpm, cellWidth, totalBeats, gridRows, not
 
   const getPosition = (event, cellWidthValue, cellHeight) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    return { beat: Math.floor((event.clientX - rect.left) / cellWidthValue), row: Math.floor((event.clientY - rect.top) / cellHeight) };
+    return { beat: Math.floor((event.clientX - rect.left) / (cellWidthValue / 2)) / 2, row: Math.floor((event.clientY - rect.top) / cellHeight) };
   };
 
   const addNote = (event, cellWidthValue, cellHeight) => {
     const { beat, row } = getPosition(event, cellWidthValue, cellHeight);
     if (beat < 0 || beat >= totalBeats || row < 0 || row >= gridRows) return;
-    const id = `${row}-${beat}`;
-    if (notes.some((note) => note.id === id)) return;
+    const id = `note-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    if (notes.some((note) => note.row === row && beat < note.beat + (note.length || 1) && beat >= note.beat)) return;
     onNoteAdd?.(row);
-    onNotesChange([...notes, { id, row, beat }]);
+    onNotesChange([...notes, { id, row, beat, length: 0.5 }]);
   };
 
   const removeNote = (event, cellWidthValue, cellHeight) => {
     const { beat, row } = getPosition(event, cellWidthValue, cellHeight);
-    onNotesChange(notes.filter((note) => note.row !== row || note.beat !== beat));
+    onNotesChange(notes.filter((note) => note.row !== row || beat < note.beat || beat >= note.beat + (note.length || 1)));
   };
 
   const moveNote = (event, cellWidthValue, cellHeight, noteId) => {
     const { beat, row } = getPosition(event, cellWidthValue, cellHeight);
     if (beat < 0 || beat >= totalBeats || row < 0 || row >= gridRows) return;
-    if (notes.some((note) => note.id !== noteId && note.row === row && note.beat === beat)) return;
+    const movingNote = notes.find((note) => note.id === noteId);
+    if (!movingNote || notes.some((note) => note.id !== noteId && note.row === row && beat < note.beat + (note.length || 1) && beat + (movingNote.length || 1) > note.beat)) return;
     onNotesChange(notes.map((note) => note.id === noteId ? { ...note, row, beat } : note));
   };
 

@@ -18,13 +18,19 @@
 .keyboardLabels { position: sticky; left: 0; z-index: 4; flex: 0 0 80px; background: #151b16; }
 .keyLabel { height: 22px; padding: 5px 8px; border-bottom: 1px solid #d4dbd4; color: #273028; background: #e8eee8; font: 10px ui-monospace, monospace; text-align: left; }
 .keyLabel.blackKey { border-bottom-color: #273029; color: #dae4dc; background: #252d27; }
-.pianoRoll { position: relative; flex: 0 0 auto; overflow: hidden; }
+.pianoRoll { position: relative; flex: 0 0 auto; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none; }
+.pianoRoll.readOnly { cursor: default; }
 .gridRow { position: absolute; width: 100%; border-bottom: 1px solid #313c33; background: #263128; pointer-events: none; }
 .gridRow.darkRow { background: #1c241e; }
 .beatLine { position: absolute; z-index: 1; top: 0; width: 1px; height: 100%; background: #354239; pointer-events: none; }
 .beatLine.barLine { width: 2px; background: #536254; }
+.beatLine.subBeatLine { background: #29352c; }
 .placedNote { position: absolute; z-index: 2; border: 1px solid #d5f99c; border-radius: 2px; background: #9bc95d; cursor: grab; }
 .placedNote:active { cursor: grabbing; }
+.placedNote { opacity: .86; }
+.placedNote.selected { outline: 2px solid #fff1bc; z-index: 3; }
+.noteSelectionBox { position: absolute; z-index: 5; border: 1px solid #d5f99c; background: #b8e56d33; pointer-events: none; }
+.noteResize { position: absolute; top: 0; right: 0; z-index: 1; width: 10px; height: 100%; cursor: ew-resize; background: #ffffff55; }
 .placedNote.triggered { background: #f0bc64; border-color: #ffe0a1; }
 .playhead { top: 0; height: 100%; }
 @media (max-width: 700px) { .editorPanel { height: calc(100svh - 82px); padding: 12px 14px 20px; } .hintText { flex-basis: 100%; margin: 0 0 10px; } .editorToolbar { gap: 10px; padding-bottom: 12px; } }

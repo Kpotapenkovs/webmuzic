@@ -19,7 +19,7 @@
 .arrangementGrid > span.bar { border-right-color: #526254; }
 .trackLane { position: absolute; left: 0; right: 0; z-index: 1; height: 64px; padding: 5px 7px; border-top: 1px solid #354239; color: #68766c; font: 9px ui-monospace, monospace; pointer-events: none; }
 .trackLane span { position: sticky; left: 7px; }
-.arrangementClip { position: absolute; z-index: 2; height: 50px; overflow: hidden; padding: 8px; display: flex; flex-direction: column; align-items: flex-start; border: 1px solid #9bc95d; border-radius: 3px; color: #172016; background: #9bc95d; cursor: grab; text-align: left; }
+.arrangementClip { position: absolute; z-index: 2; height: 50px; overflow: hidden; padding: 8px; display: flex; flex-direction: column; align-items: flex-start; border: 1px solid #9bc95d; border-radius: 3px; color: #172016; background: #9bc95d; opacity: .88; cursor: grab; text-align: left; }
 .arrangementClip.selected { border-color: #f0bc64; background: #f0bc64; }
 .arrangementClip.dragging { z-index: 5; border-color: #f7ffd8; background: #c9f477; box-shadow: 0 0 0 3px rgba(184, 229, 109, .28), 0 10px 24px rgba(0, 0, 0, .45); cursor: grabbing; filter: saturate(1.25) brightness(1.08); }
 .arrangementGrid:has(.arrangementClip.dragging) .arrangementClip:not(.dragging) { opacity: .58; }

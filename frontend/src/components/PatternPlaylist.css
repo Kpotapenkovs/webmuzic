@@ -1,5 +1,19 @@
-.patternPlaylist { width: 300px; max-height: none; min-height: 0; padding: 18px 24px; background: #171b18; text-align: left; }
-.playlistHeader { display: flex; align-items: flex-start; justify-content: space-between; padding: 0 4px 20px; border-bottom: 1px solid #2a312c; }
+.patternPlaylist { 
+  width: 300px;
+  max-height: none;
+  min-height: 0; padding: 18px 24px;
+  background: #171b18;
+  text-align: left; 
+  }
+
+.playlistHeader { 
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0 4px 20px;
+  border-bottom: 1px solid #2a312c;
+  }
+  
 .playlistKicker { color: #7c8a80; font: 10px ui-monospace, monospace; letter-spacing: 1.3px; }
 .playlistHeader h2 { margin: 7px 0 0; color: #edf3ee; font: 400 25px/1 Georgia, serif; }
 .addPatternButton { width: 29px; height: 29px; border: 1px solid #536254; border-radius: 3px; color: #b7e56d96; background: transparent; cursor: pointer; font-size: 21px; line-height: 20px; }

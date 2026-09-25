@@ -26,6 +26,9 @@ export default function useKeyboardPlay({ onNoteOn, onNoteOff }) {
     };
 
     const handleKeyDown = (e) => {
+      const target = e.target;
+      if (target instanceof HTMLElement && (target.isContentEditable || target.closest("input, textarea, select, [contenteditable='true']"))) return;
+      if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
       const key = e.key.toLowerCase();
 
       if (e.repeat) return;

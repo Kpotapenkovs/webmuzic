@@ -18,7 +18,8 @@ export default function useProjectPersistence(workspace) {
     let isCancelled = false;
     setIsLoading(true);
 
-    fetch(`/projects/${projectId}`, {
+    const isPublicView = new URLSearchParams(window.location.search).get("readonly") === "1";
+    fetch(isPublicView ? `/publications/${projectId}/data` : `/projects/${projectId}`, {
       credentials: "include",
       headers: { Accept: "application/json" },
     })
@@ -53,7 +54,7 @@ export default function useProjectPersistence(workspace) {
     };
   }, []);
 
-  const save = useCallback(async () => {
+  const save = useCallback(async (title) => {
     setIsSaving(true);
 
     try {
@@ -73,7 +74,7 @@ export default function useProjectPersistence(workspace) {
           "X-CSRF-TOKEN": token,
         },
         body: JSON.stringify({
-          title: project?.title ?? DEFAULT_PROJECT_TITLE,
+          title: title ?? project?.title ?? DEFAULT_PROJECT_TITLE,
           data: projectData,
         }),
       });
@@ -91,5 +92,5 @@ export default function useProjectPersistence(workspace) {
     }
   }, [project, workspace]);
 
-  return { isLoading, isSaving, save };
+  return { project, isLoading, isSaving, save };
 }

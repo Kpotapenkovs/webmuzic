@@ -6,7 +6,7 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
   const [position, setPosition] = useState(0);
   const frameRef = useRef(null);
   const positionRef = useRef(0);
-  const lastBeatRef = useRef(-1);
+  const lastStepRef = useRef(-1);
   const bpmRef = useRef(bpm);
   const playbackDataRef = useRef({ end: 0, notesByBeat: new Map() });
 
@@ -24,10 +24,10 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
       end = Math.max(end, clip.startBeat + getPatternLength(pattern));
 
       pattern?.notes.forEach((note) => {
-        const beat = clip.startBeat + note.beat;
-        const notes = notesByBeat.get(beat) ?? [];
+        const step = Math.round((clip.startBeat + note.beat) * 2);
+        const notes = notesByBeat.get(step) ?? [];
         notes.push(note);
-        notesByBeat.set(beat, notes);
+        notesByBeat.set(step, notes);
       });
     });
 
@@ -39,7 +39,7 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
   const stop = () => {
     cancelAnimationFrame(frameRef.current);
     positionRef.current = 0;
-    lastBeatRef.current = -1;
+    lastStepRef.current = -1;
     setPosition(0);
     setIsPlaying(false);
   };
@@ -50,7 +50,7 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
   const seek = (nextPosition) => {
     const position = Math.max(0, Math.min(300, nextPosition));
     positionRef.current = position;
-    lastBeatRef.current = -1;
+    lastStepRef.current = -1;
     setPosition(position);
   };
   const start = () => {
@@ -69,24 +69,23 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
       const end = getEnd();
       const next = positionRef.current + (bpmRef.current * delta) / 60000;
       const reachedEnd = next >= end;
-      const currentPosition = reachedEnd ? end : next;
-      const beat = Math.floor(currentPosition);
-      if (lastBeatRef.current < 0) {
-        playBeat(beat);
-      } else if (beat > lastBeatRef.current) {
-        for (let crossedBeat = lastBeatRef.current + 1; crossedBeat < Math.min(beat + 1, end); crossedBeat += 1) playBeat(crossedBeat);
+      const currentPosition = reachedEnd ? next % end : next;
+      const step = Math.floor(currentPosition * 2);
+      if (reachedEnd && lastStepRef.current >= 0) {
+        for (let crossedStep = lastStepRef.current + 1; crossedStep < Math.ceil(end * 2); crossedStep += 1) playStep(crossedStep);
+        for (let crossedStep = 0; crossedStep <= step; crossedStep += 1) playStep(crossedStep);
+      } else if (lastStepRef.current < 0) {
+        playStep(step);
+      } else if (step > lastStepRef.current) {
+        for (let crossedStep = lastStepRef.current + 1; crossedStep <= step; crossedStep += 1) playStep(crossedStep);
       }
-      lastBeatRef.current = beat;
+      lastStepRef.current = step;
 
-      function playBeat(beatToPlay) {
-        playbackDataRef.current.notesByBeat.get(beatToPlay)?.forEach((note) => onNotePlay(note.row));
+      function playStep(stepToPlay) {
+        playbackDataRef.current.notesByBeat.get(stepToPlay)?.forEach((note) => onNotePlay(note.row));
       }
       positionRef.current = currentPosition;
       setPosition(currentPosition);
-      if (reachedEnd) {
-        setIsPlaying(false);
-        return;
-      }
       frameRef.current = requestAnimationFrame(animate);
     };
     frameRef.current = requestAnimationFrame(animate);

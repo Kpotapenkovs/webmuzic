@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['title', 'data'])]
+#[Fillable(['title', 'data', 'published_at'])]
 class Project extends Model
 {
     /** @use HasFactory<ProjectFactory> */
@@ -19,6 +20,11 @@ class Project extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function comments(): HasMany
+    {
+        return $this->hasMany(ProjectComment::class);
+    }
+
     /**
      * @return array<string, string>
      */
@@ -26,6 +32,7 @@ class Project extends Model
     {
         return [
             'data' => 'array',
+            'published_at' => 'datetime',
         ];
     }
 }

@@ -17,6 +17,7 @@ export default function useStudioWorkspace() {
     renamePattern,
     deletePattern,
     updatePatternNotes,
+    extendPattern,
     arrangement,
     addToArrangement,
     moveInArrangement,
@@ -55,9 +56,9 @@ export default function useStudioWorkspace() {
   };
   const openPianoRoll = () => setIsPianoRollOpen(true);
 
-  const loadProject = (projectData) => {
+  const loadProject = (projectData, isDirty = false) => {
     setBpm(Math.max(MIN_BPM, Math.min(MAX_BPM, Number(projectData.bpm) || DEFAULT_BPM)));
-    loadPatternProject(projectData);
+    loadPatternProject(projectData, isDirty);
     setIsPianoRollOpen(false);
   };
 
@@ -111,6 +112,7 @@ export default function useStudioWorkspace() {
     renamePattern,
     deletePattern,
     updatePatternNotes,
+    extendPattern: (id) => extendPattern(id),
     addToArrangement,
     moveInArrangement,
     removeFromArrangement,

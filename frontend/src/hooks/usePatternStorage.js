@@ -77,8 +77,12 @@ export default function usePatternStorage() {
     });
     setHasUnsavedChanges(true);
   };
+  const extendPattern = (id) => {
+    setPatterns((current) => current.map((pattern) => pattern.id === id ? { ...pattern, length: (pattern.length || 4) + 4 } : pattern));
+    setHasUnsavedChanges(true);
+  };
 
-  const loadProject = (projectData) => {
+  const loadProject = (projectData, isDirty = false) => {
     const nextPatterns = Array.isArray(projectData.patterns) && projectData.patterns.length > 0
       ? projectData.patterns
       : [DEFAULT_PATTERN];
@@ -87,10 +91,10 @@ export default function usePatternStorage() {
     setPatterns(nextPatterns);
     setSelectedPatternId(selectedPatternExists ? projectData.selectedPatternId : nextPatterns[0].id);
     setArrangement(Array.isArray(projectData.arrangement) ? projectData.arrangement : []);
-    setHasUnsavedChanges(false);
+    setHasUnsavedChanges(isDirty);
   };
 
   const markSaved = () => setHasUnsavedChanges(false);
 
-  return { patterns, selectedPatternId, selectPattern, createPattern, renamePattern, deletePattern, updatePatternNotes, arrangement, addToArrangement, moveInArrangement, removeFromArrangement, loadProject, markSaved };
+  return { patterns, selectedPatternId, selectPattern, createPattern, renamePattern, deletePattern, updatePatternNotes, extendPattern, arrangement, addToArrangement, moveInArrangement, removeFromArrangement, loadProject, markSaved };
 }

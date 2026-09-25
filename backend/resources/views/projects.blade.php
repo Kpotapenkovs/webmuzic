@@ -33,12 +33,12 @@
                     <p class="font-mono text-[11px] tracking-[0.14em] text-[#b8e56d]">DARBA VIETA</p>
                     <h2 id="projects-heading" class="mt-3 max-w-xl font-serif text-4xl leading-none tracking-tight text-[#edf3ee] sm:text-5xl">Tavi saglabātie projekti.</h2>
                 </div>
-                <p class="max-w-xs text-sm leading-6 text-[#98a79b]">Atver projektu studijā, lai turpinātu veidot aranžējumu un eksperimentētu ar skaņu.</p>
+                <p class="max-w-xs text-sm leading-6 text-[#98a79b]">Atver projektu studijā, lai turpinātu veidot aranžējumu un eksperimentētu ar skaņu. <a class="text-[#b8e56d]" href="{{ route('publications.index') }}">Apskatīt publikācijas →</a></p>
             </div>
 
             <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 @forelse ($projects as $project)
-                    <a href="{{ $frontendUrl }}?project={{ $project->id }}" class="group flex min-h-64 flex-col justify-between rounded-[3px] border border-[#3a463e] bg-[#171b18] p-5 transition hover:border-[#b8e56d]/70 hover:bg-[#1c221d] focus:outline-none focus:ring-2 focus:ring-[#b8e56d]">
+                    <article class="group flex min-h-64 flex-col justify-between rounded-[3px] border border-[#3a463e] bg-[#171b18] p-5 transition hover:border-[#b8e56d]/70 hover:bg-[#1c221d]">
                         <div class="flex items-start justify-between gap-4">
                             <span class="font-mono text-[11px] tracking-[0.14em] text-[#8d9b91]">PROJECT {{ str_pad((string) $project->id, 3, '0', STR_PAD_LEFT) }}</span>
                             <span class="h-2 w-2 rounded-full bg-[#b8e56d] shadow-[0_0_10px_#b8e56d]"></span>
@@ -48,10 +48,22 @@
                             <h3 class="mt-3 font-serif text-3xl leading-none text-[#edf3ee]">{{ $project->title }}</h3>
                             <div class="mt-6 flex items-center justify-between border-t border-[#2a312c] pt-4 font-mono text-[11px] text-[#8d9b91]">
                                 <span>LABOTS {{ $project->updated_at->diffForHumans() }}</span>
-                                <span class="text-base text-[#b8e56d] transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
+                                <a href="{{ $frontendUrl }}?project={{ $project->id }}" class="text-sm text-[#b8e56d]">Atvērt projektu →</a>
+                            </div>
+                            <div class="mt-4 flex items-center justify-between gap-3">
+                                @if ($project->published_at)
+                                    <a class="text-sm text-[#b8e56d]" href="{{ route('publications.show', $project) }}">Apskatīt publikāciju</a>
+                                    <span class="text-xs text-[#8d9b91]">Publicēts {{ $project->published_at->format('Y-m-d H:i') }}</span>
+                                @else
+                                    <span class="text-xs text-[#8d9b91]">Nav publicēts</span>
+                                @endif
+                                <form method="POST" action="{{ route('projects.publish', $project) }}">
+                                    @csrf
+                                    <button class="rounded border border-[#b8e56d] px-3 py-2 text-xs text-[#b8e56d]" type="submit">{{ $project->published_at ? 'Atjaunot publikāciju' : 'Publicēt' }}</button>
+                                </form>
                             </div>
                         </div>
-                    </a>
+                    </article>
                 @empty
                     <div class="flex min-h-64 flex-col justify-center rounded-[3px] border border-dashed border-[#3a463e] bg-[#171b18]/50 p-6 text-center">
                         <p class="font-serif text-2xl text-[#edf3ee]">Vēl nav saglabātu projektu</p>

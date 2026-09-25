@@ -8,6 +8,7 @@ export default defineConfig({
     proxy: {
       '/login': 'http://localhost:8000',
       '/projects': 'http://localhost:8000',
+      '/publications': 'http://localhost:8000',
       '/session': 'http://localhost:8000',
     },
   },
