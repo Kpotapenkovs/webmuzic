@@ -31,7 +31,6 @@ export default function PatternPlaylist({ patterns, selectedPatternId, isEditorO
           </div>
         ))}
       </div>
-      <p className="storageStatus">Saved locally</p>
     </aside>
   );
 }

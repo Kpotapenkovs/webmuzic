@@ -120,9 +120,7 @@ export default function PianoRollEditor({ notes, onNotesChange, playback, volume
             } else if (interaction.type === "move") {
               const deltaBeat = Math.round((x - interaction.startX) / (CELL_WIDTH / 2)) / 2; const deltaRow = Math.round((y - interaction.startY) / CELL_HEIGHT); const ids = new Set(interaction.ids);
               const moved = interaction.original.map((note) => ids.has(note.id) ? { ...note, beat: Math.max(0, Math.min(TOTAL_BEATS - (note.length || 1), note.beat + deltaBeat)), row: Math.max(0, Math.min(GRID_ROWS - 1, note.row + deltaRow)) } : note);
-              const moving = moved.filter((note) => ids.has(note.id)); const stationary = moved.filter((note) => !ids.has(note.id));
-              const valid = moving.every((note) => !stationary.some((other) => other.row === note.row && note.beat < other.beat + (other.length || 1) && note.beat + (note.length || 1) > other.beat));
-              interaction.preview = valid ? moved : null; setPreviewNotes(interaction.preview);
+              interaction.preview = moved; setPreviewNotes(interaction.preview);
             }
           }}
           onPointerDown={(event) => {

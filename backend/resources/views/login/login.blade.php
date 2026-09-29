@@ -12,7 +12,7 @@
 <body>
     <main class="auth-shell">
         <aside class="brand-panel">
-            <a class="brand" href="{{ url('/') }}" style="color:inherit;text-decoration:none">WEB<span>MUZIC</span></a>
+            <a class="brand" href="{{ config('services.frontend.url') }}" style="color:inherit;text-decoration:none">WEB<span>MUZIC</span></a>
             <div class="brand-copy"><span class="kicker">YOUR IDEAS, IN RHYTHM</span><h1>Atgriezies savā studijā.</h1><p>Pieslēdzies un turpini veidot skaņas, ritmus un dziesmas savā WebMuzic studijā.</p></div>
             <div class="soundmark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
         </aside>
@@ -26,7 +26,7 @@
                 <button class="submit" type="submit">Pieslēgties</button>
             </form>
             <p class="form-footer">Vēl nav konta? <a href="{{ route('signup.index') }}">Izveidot kontu</a></p>
-            <a class="back" href="{{ url('/') }}">← Atpakaļ uz studiju</a>
+            <a class="back" href="{{ config('services.frontend.url') }}">← Atpakaļ uz studiju</a>
         </div></section>
     </main>
 </body>

@@ -22,9 +22,12 @@ export default function usePatternStorage() {
 
   const selectPattern = (id) => setSelectedPatternId(id);
   const createPattern = () => {
-    const id = `pattern-${Date.now()}`;
+    const id = `pattern-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     setPatterns((current) => {
-      const next = [...current, { id, name: `Pattern ${current.length + 1}`, notes: [] }];
+      const usedNames = new Set(current.map((pattern) => pattern.name.trim().toLocaleLowerCase()));
+      let number = 1;
+      while (usedNames.has(`pattern ${number}`)) number += 1;
+      const next = [...current, { id, name: `Pattern ${number}`, notes: [] }];
       return next;
     });
     setHasUnsavedChanges(true);
@@ -32,11 +35,13 @@ export default function usePatternStorage() {
   };
   const renamePattern = (id, name) => {
     const cleanName = name.trim();
-      if (!cleanName) return;
-      setPatterns((current) => {
-        const next = current.map((pattern) => pattern.id === id ? { ...pattern, name: cleanName } : pattern);
-        return next;
-      });
+    if (!cleanName) return;
+    setPatterns((current) => {
+      const duplicateName = current.some((pattern) => pattern.id !== id
+        && pattern.name.trim().toLocaleLowerCase() === cleanName.toLocaleLowerCase());
+      if (duplicateName) return current;
+      return current.map((pattern) => pattern.id === id ? { ...pattern, name: cleanName } : pattern);
+    });
     setHasUnsavedChanges(true);
   };
   const deletePattern = (id) => {
