@@ -15,6 +15,8 @@ class PublicationController extends Controller
         $projects = Project::query()
             ->whereNotNull('published_at')
             ->with('user')
+            ->withAvg('ratings', 'stars')
+            ->withCount('ratings')
             ->latest('published_at')
             ->get();
 
@@ -27,8 +29,27 @@ class PublicationController extends Controller
 
         return view('publication', [
             'project' => $project->load(['user', 'comments.user']),
+            'ratingCount' => $project->ratings()->count(),
+            'ratingAverage' => $project->ratings()->avg('stars'),
+            'userRating' => auth()->user()?->projectRatings()->where('project_id', $project->id)->value('stars'),
             'frontendUrl' => config('services.frontend.url'),
         ]);
+    }
+
+    public function storeRating(Request $request, Project $project): RedirectResponse
+    {
+        abort_unless($project->published_at, 404);
+
+        $validated = $request->validate([
+            'stars' => ['required', 'integer', 'between:1,5'],
+        ]);
+
+        $project->ratings()->updateOrCreate(
+            ['user_id' => $request->user()->id],
+            ['stars' => $validated['stars']],
+        );
+
+        return redirect()->route('publications.show', $project);
     }
 
     public function data(Project $project): JsonResponse

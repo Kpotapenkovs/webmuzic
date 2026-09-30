@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getPatternLength } from "../utils/patternTiming";
+import { MAX_TIMELINE_BEATS } from "../config/studio";
 
 export default function useArrangementPlayback({ bpm, patterns, arrangement, onNotePlay }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -48,7 +49,7 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
     setIsPlaying(false);
   };
   const seek = (nextPosition) => {
-    const position = Math.max(0, Math.min(300, nextPosition));
+    const position = Math.max(0, Math.min(MAX_TIMELINE_BEATS, nextPosition));
     positionRef.current = position;
     lastStepRef.current = -1;
     setPosition(position);
@@ -58,7 +59,7 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
     if (!getEnd()) return;
     if (positionRef.current >= getEnd()) {
       positionRef.current = 0;
-      lastBeatRef.current = -1;
+      lastStepRef.current = -1;
       setPosition(0);
     }
     setIsPlaying(true);

@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import SeekBar from "./SeekBar";
 import useKeyboardPlay from "../../hooks/useKeyboardPlay";
+import { MAX_TIMELINE_BEATS } from "../config/studio";
 import "./PianoRollEditor.css";
 
 const GRID_ROWS = 88;
 const CELL_HEIGHT = 22;
 const CELL_WIDTH = 60;
-const TOTAL_BEATS = 300;
+const TOTAL_BEATS = MAX_TIMELINE_BEATS;
 const KEYBOARD_WIDTH = 80;
 export default function PianoRollEditor({ notes, onNotesChange, playback, volume = 0.5, onVolumeChange = () => {}, readOnly = false }) {
   const [selectedNotes, setSelectedNotes] = useState([]);

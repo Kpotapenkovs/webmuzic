@@ -14,6 +14,23 @@
         .fact { padding: 10px 13px; border: 1px solid #354238; border-radius: 5px; color: #c8d2ca; background: #111713; font: 11px ui-monospace, SFMono-Regular, Consolas, monospace; }
         .open-project { display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; padding: 12px 16px; border: 1px solid #b8e56d; border-radius: 5px; color: #172016; background: #b8e56d; font-size: 13px; font-weight: 650; text-decoration: none; transition: background .15s, transform .15s; }
         .open-project:hover { transform: translateY(-1px); background: #c9f58b; }
+        .ratings { width: min(100%, 720px); margin: 32px auto 0; padding: 20px; border: 1px solid #2b352d; border-radius: 6px; background: #151a16; }
+        .ratings-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+        .rating-summary { color: #c9f58b; font: 12px ui-monospace, SFMono-Regular, Consolas, monospace; }
+        .rating-voter-total { margin-left: 3px; color: #c9f58b; font-size: 10px; opacity: .65; }
+        .rating-form { margin-top: 14px; }
+        .rating-choice-row { display: flex; align-items: center; gap: 8px; }
+        .rating-voter-count { color: #89968d; font: 10px ui-monospace, SFMono-Regular, Consolas, monospace; opacity: .68; }
+        .star-picker { margin: 0; padding: 0; border: 0; }
+        .star-picker legend { margin-bottom: 7px; color: #9ba99e; font-size: 12px; }
+        .stars { display: inline-flex; flex-direction: row-reverse; justify-content: flex-end; }
+        .stars input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
+        .stars label { display: inline-block; padding: 3px 4px; color: #566158; cursor: pointer; font-size: 36px; line-height: 1.2; transition: color .15s, transform .15s; }
+        .stars label:hover { transform: scale(1.12); }
+        .stars label:hover, .stars label:hover ~ label, .stars input:checked ~ label, .stars input:checked + label { color: #b8e56d; }
+        .stars input:focus-visible + label { outline: 2px solid #b8e56d; outline-offset: 3px; }
+        .stars input:checked + label { color: #b8e56d; }
+        .ratings .error { flex-basis: 100%; }
         .comments { width: min(100%, 720px); margin: 46px auto 0; }
         .comments-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding-bottom: 14px; border-bottom: 1px solid #2c352e; }
         h2 { margin: 0; font: 500 29px/1.2 Georgia, "Times New Roman", serif; }

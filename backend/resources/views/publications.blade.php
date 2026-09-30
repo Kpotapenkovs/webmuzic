@@ -19,7 +19,7 @@
         </div>
 
         <header class="intro">
-            <div><div class="eyebrow">Kopienas izlase</div><h1>Publikācijas</h1></div>
+            <div><div class="eyebrow"></div><h1>Publikācijas</h1></div>
             <p class="intro-copy">Iepazīsti citu autoru projektus, atver tos studijā un pievieno savu komentāru.</p>
         </header>
 
@@ -37,6 +37,12 @@
                         <div class="project-top"><span class="published-tag">Publicēts</span><time class="project-date" datetime="{{ $project->published_at->toIso8601String() }}">{{ $project->published_at->format('Y-m-d · H:i') }}</time></div>
                         <h2>{{ $project->title }}</h2>
                         <p class="author">Autors {{ $project->user->username }}</p>
+                        @php($ratingPercent = $project->ratings_avg_stars ? ($project->ratings_avg_stars) * 100 : 0)
+                        <div class="project-rating" aria-label="Vidējais vērtējums: {{ $project->ratings_avg_stars ? number_format($project->ratings_avg_stars, 1) : '0.0' }} no 5, {{ $project->ratings_count }} vērtētāji">
+                            <span class="rating-stars" aria-hidden="true" style="--rating-fill: {{ $ratingPercent }}%">★★★★★</span>
+                            <span class="rating-average">{{ $project->ratings_avg_stars ? number_format($project->ratings_avg_stars, 1) : '—' }} / 5</span>
+                            <span class="rating-count">{{ $project->ratings_count }}</span>
+                        </div>
                         <div class="facts"><span class="fact">{{ $project->data['bpm'] ?? '—' }} BPM</span><span class="fact">{{ count($project->data['patterns'] ?? []) }} patterns</span><span class="fact">{{ count($project->data['arrangement'] ?? []) }} klipi</span></div>
                         <div class="project-bottom"><span>Atvērt publikāciju</span><span class="arrow" aria-hidden="true">↗</span></div>
                     </a>

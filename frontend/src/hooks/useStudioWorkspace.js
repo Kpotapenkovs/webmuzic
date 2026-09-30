@@ -3,7 +3,7 @@ import usePatternStorage from "./usePatternStorage";
 import useArrangementPlayback from "./useArrangementPlayback";
 import useNoteSound from "./useNoteSound";
 import usePianoRoll from "./usePianoRoll";
-import { DEFAULT_BPM, DEFAULT_NOTE_VOLUME, MAX_BPM, MIN_BPM } from "../config/studio";
+import { DEFAULT_BPM, DEFAULT_NOTE_VOLUME, MAX_BPM, MAX_TIMELINE_BEATS, MIN_BPM } from "../config/studio";
 
 export default function useStudioWorkspace() {
   const [isPianoRollOpen, setIsPianoRollOpen] = useState(false);
@@ -32,7 +32,7 @@ export default function useStudioWorkspace() {
   const pianoRollPlayback = usePianoRoll({
     bpm,
     cellWidth: 60,
-    totalBeats: 300,
+    totalBeats: MAX_TIMELINE_BEATS,
     gridRows: 88,
     notes: selectedPattern.notes,
     onNotesChange: (notes) => updatePatternNotes(selectedPattern.id, notes),

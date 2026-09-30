@@ -20,6 +20,7 @@ Route::middleware('auth')->group(function (): void {
     Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::post('/projects/{project}/publish', [ProjectController::class, 'publish'])->name('projects.publish');
     Route::post('/publications/{project}/comments', [PublicationController::class, 'storeComment'])->name('publications.comments.store');
+    Route::put('/publications/{project}/rating', [PublicationController::class, 'storeRating'])->name('publications.rating.store');
     Route::get('/session/user', [SessionController::class, 'show'])->name('session.user');
     Route::post('/session/logout', [SessionController::class, 'destroy'])->name('session.logout');
 });

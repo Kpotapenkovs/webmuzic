@@ -25,6 +25,11 @@ class Project extends Model
         return $this->hasMany(ProjectComment::class);
     }
 
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(ProjectRating::class);
+    }
+
     /**
      * @return array<string, string>
      */

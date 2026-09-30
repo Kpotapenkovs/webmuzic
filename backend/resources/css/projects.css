@@ -3,9 +3,10 @@
         .projects-main { width: min(100% - 48px, 1120px); margin: 0 auto; padding: 58px 0 80px; }
         .projects-intro { display: flex; align-items: end; justify-content: space-between; gap: 30px; padding-bottom: 28px; border-bottom: 1px solid #2a312c; }
         .projects-intro h2 { margin: 12px 0 0; color: #edf3ee; font: 400 clamp(36px, 5vw, 54px)/1 Georgia, serif; letter-spacing: -1.5px; }
-        .projects-intro p { max-width: 355px; margin: 0; color: #98a79b; font-size: 14px; line-height: 1.7; }
-        .projects-intro a, .published-link { color: #b8e56d; text-decoration: none; }
-        .projects-intro a:hover, .published-link:hover { text-decoration: underline; }
+        .publications-button { display: inline-flex; align-items: center; gap: 8px; padding: 10px 13px; border: 1px solid #b8e56d; border-radius: 4px; color: #172016; background: #b8e56d; font-size: 12px; font-weight: 650; text-decoration: none; transition: background .15s; }
+        .publications-button:hover { background: #c9f58b; }
+        .published-link { color: #b8e56d; text-decoration: none; }
+        .published-link:hover { text-decoration: underline; }
         .projects-count { margin: 26px 0 12px; color: #87948a; font: 11px ui-monospace, monospace; letter-spacing: .08em; }
         .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr)); gap: 16px; align-items: stretch; }
         .project-card { min-width: 0; display: flex; flex-direction: column; padding: 20px; border: 1px solid #354238; border-radius: 7px; background: linear-gradient(145deg, #1a211c, #141915 78%); transition: border-color .18s, transform .18s, background .18s; }
@@ -40,4 +41,4 @@
         .logout-form { position: absolute; top: calc(100% + 7px); right: 0; z-index: 2; min-width: 130px; padding: 4px; border: 1px solid #3a463e; border-radius: 4px; background: #202720; }
         .logout-button { width: 100%; padding: 8px; border: 0; border-radius: 3px; color: #dce8df; background: transparent; cursor: pointer; text-align: left; font: 11px ui-monospace, monospace; }
         .logout-button:hover { color: #c9f58b; background: #2a312c; }
-        @media (max-width: 650px) { .projects-header { min-height: 68px; padding: 12px 18px; } .projects-main { width: calc(100% - 36px); padding: 38px 0 56px; } .projects-intro { align-items: flex-start; flex-direction: column; gap: 16px; } .projects-intro p { max-width: 480px; } .projects-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 650px) { .projects-header { min-height: 68px; padding: 12px 18px; } .projects-main { width: calc(100% - 36px); padding: 38px 0 56px; } .projects-intro { align-items: flex-start; flex-direction: column; gap: 16px; } .projects-grid { grid-template-columns: 1fr; } }

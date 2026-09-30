@@ -21,6 +21,10 @@
         .project-date { color: #859187; font: 10px ui-monospace, SFMono-Regular, Consolas, monospace; }
         h2 { margin: 25px 0 7px; font: 500 clamp(25px, 3vw, 34px)/1.1 Georgia, "Times New Roman", serif; overflow-wrap: anywhere; }
         .author { margin: 0; color: #9ca99f; font-size: 13px; }
+        .project-rating { display: flex; align-items: center; gap: 9px; margin-top: 12px; }
+        .rating-stars { display: inline-block; color: transparent; background: linear-gradient(90deg, #b8e56d var(--rating-fill), #566158 var(--rating-fill)); background-clip: text; -webkit-background-clip: text; font-size: 17px; letter-spacing: 1px; line-height: 1; white-space: nowrap; }
+        .rating-average, .rating-count { color: #d6ded7; font: 11px ui-monospace, SFMono-Regular, Consolas, monospace; }
+        .rating-count { margin-left: -5px; color: #89968d; font-size: 9px; opacity: .65; }
         .facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
         .fact { padding: 7px 9px; border: 1px solid #2e3931; border-radius: 4px; color: #c5d0c7; background: #111713; font: 10px ui-monospace, SFMono-Regular, Consolas, monospace; }
         .project-bottom { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: auto; padding-top: 21px; color: #b8e56d; font-size: 12px; }

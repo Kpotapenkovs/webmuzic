@@ -33,7 +33,7 @@
                 <div>
                     <h2 id="projects-heading">Saglabātie projekti</h2>
                 </div>
-                <p>Atver projektu studijā, lai turpinātu veidot aranžējumu un eksperimentētu ar skaņu. <a href="{{ route('publications.index') }}">Apskatīt publikācijas →</a></p>
+                <a class="publications-button" href="{{ route('publications.index') }}">Publikācijas <span aria-hidden="true">→</span></a>
             </div>
 
             <p class="projects-count">{{ $projects->count() }} {{ $projects->count() === 1 ? 'PROJEKTS' : 'PROJEKTI' }}</p>

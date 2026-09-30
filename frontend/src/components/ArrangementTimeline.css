@@ -12,9 +12,9 @@
 .sourcePattern small { margin-left: auto; color: #718073; font: 9px ui-monospace, monospace; }
 .timelineScroll { min-width: 0; min-height: 0; overflow: auto; flex: 1; overscroll-behavior: contain; }
 .timelineScale, .arrangementGrid { position: relative; min-width: 15600px; }
-.timelineScale { height: 27px; display: grid; grid-template-columns: repeat(300, 52px); border-bottom: 1px solid #2f3a31; color: #718073; font: 9px ui-monospace, monospace; user-select: none; }
+.timelineScale { height: 27px; display: grid; grid-auto-columns: 52px; grid-auto-flow: column; border-bottom: 1px solid #2f3a31; color: #718073; font: 9px ui-monospace, monospace; user-select: none; }
 .timelineScale span { padding: 7px 5px; border-right: 1px solid #2b382e; user-select: none; }
-.arrangementGrid { height: 768px; display: grid; grid-template-columns: repeat(300, 52px); background: #1c241e; }
+.arrangementGrid { height: 768px; display: grid; grid-auto-columns: 52px; grid-auto-flow: column; background: #1c241e; }
 .arrangementGrid > span { border-right: 1px solid #2b382e; }
 .arrangementGrid > span.bar { border-right-color: #526254; }
 .trackLane { position: absolute; left: 0; right: 0; z-index: 1; height: 64px; padding: 5px 7px; border-top: 1px solid #354239; color: #68766c; font: 9px ui-monospace, monospace; pointer-events: none; }
