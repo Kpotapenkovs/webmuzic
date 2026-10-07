@@ -5,6 +5,7 @@ import useStudioWorkspace from "./hooks/useStudioWorkspace";
 import useSessionUser from "./hooks/useSessionUser";
 import useProjectPersistence from "./hooks/useProjectPersistence";
 import useStudioProjectActions from "./hooks/useStudioProjectActions";
+import { MAX_BPM, MIN_BPM } from "./config/studio";
 import "./App.css";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000";
@@ -14,6 +15,7 @@ export default function App() {
   const { isLoading: isSessionLoading, user, logout } = useSessionUser();
   const { project, isLoading: isProjectLoading, isSaving, save } = useProjectPersistence(workspace);
   const isReadOnly = new URLSearchParams(window.location.search).get("readonly") === "1";
+  const isWorkspaceLocked = isReadOnly || isProjectLoading;
   const { handleSave, exportProject, importProject } = useStudioProjectActions({ workspace, project, isReadOnly, save });
   const {
     isPianoRollOpen,
@@ -66,24 +68,24 @@ export default function App() {
         </div>
         <div className="studioControls">
           <div className="transportControls topTransport" aria-label="Playback controls">
-            <button className="transportButton primary" type="button" onClick={startPlayback} disabled={isPlaybackActive}>Start</button>
+            <button className="transportButton primary" type="button" onClick={startPlayback} disabled={isProjectLoading || isPlaybackActive}>Start</button>
             <button className="transportButton" type="button" onClick={pausePlayback} disabled={!isPlaybackActive}>Pause</button>
             <button className="transportButton" type="button" onClick={stopPlayback}>Stop</button>
           </div>
           <label className="patternSelectControl">
             <span>Pattern</span>
-            <select value={selectedPatternId} onChange={(event) => selectPattern(event.target.value)}>
+            <select value={selectedPatternId} onChange={(event) => selectPattern(event.target.value)} disabled={isProjectLoading}>
               {patterns.map((pattern) => <option value={pattern.id} key={pattern.id}>{pattern.name}</option>)}
             </select>
           </label>
           <label className="bpmSelectControl">
             <span>BPM</span>
-            <input type="number" min="40" max="240" value={bpm} onChange={(event) => handleBpmChange(Number(event.target.value))} disabled={isReadOnly} />
+            <input type="number" min={MIN_BPM} max={MAX_BPM} step="1" value={bpm} onChange={(event) => handleBpmChange(Number(event.target.value))} disabled={isWorkspaceLocked} />
           </label>
         </div>
         <div className="accountControls">
-          {!isReadOnly && <button className="accountButton" type="button" onClick={exportProject}>Eksportēt JSON</button>}
-          {!isReadOnly && <label className="accountButton">Importēt JSON<input hidden type="file" accept="application/json,.json" onChange={importProject} /></label>}
+          {!isReadOnly && <button className="accountButton" type="button" onClick={exportProject} disabled={isProjectLoading}>Eksportēt JSON</button>}
+          {!isReadOnly && <label className={`accountButton ${isProjectLoading ? "disabled" : ""}`}>Importēt JSON<input hidden type="file" accept="application/json,.json" onChange={importProject} disabled={isProjectLoading} /></label>}
           {!isReadOnly && <button className="saveButton" type="button" onClick={handleSave} disabled={isSaving || isProjectLoading}>
             {isSaving ? "Saving..." : "Save"}
           </button>}
@@ -108,19 +110,19 @@ export default function App() {
           selectedPatternId={selectedPatternId}
           isEditorOpen={isPianoRollOpen}
           onSelect={handlePatternClick}
-          onCreate={isReadOnly ? () => {} : createPattern}
-          onRename={isReadOnly ? () => {} : renamePattern}
-          onDelete={isReadOnly ? () => {} : deletePattern}
-          onExtend={isReadOnly ? () => {} : extendPattern}
-          readOnly={isReadOnly}
+          onCreate={isWorkspaceLocked ? () => {} : createPattern}
+          onRename={isWorkspaceLocked ? () => {} : renamePattern}
+          onDelete={isWorkspaceLocked ? () => {} : deletePattern}
+          onExtend={isWorkspaceLocked ? () => {} : extendPattern}
+          readOnly={isWorkspaceLocked}
         />
         {isPianoRollOpen ? (
           <PianoRollEditor
             key={selectedPattern.id}
             notes={selectedPattern.notes}
-            onNotesChange={(notes) => !isReadOnly && updatePatternNotes(selectedPattern.id, notes)}
+            onNotesChange={(notes) => !isWorkspaceLocked && updatePatternNotes(selectedPattern.id, notes)}
             playback={pianoRollPlayback}
-            readOnly={isReadOnly}
+            readOnly={isWorkspaceLocked}
             volume={volume}
             onVolumeChange={setVolume}
           />
@@ -132,13 +134,13 @@ export default function App() {
             position={arrangementPlayback.position}
             isPlaying={arrangementPlayback.isPlaying}
             onSelectPattern={selectPattern}
-            onAdd={isReadOnly ? () => {} : addToArrangement}
-            onMove={isReadOnly ? () => {} : moveInArrangement}
-            onRemove={isReadOnly ? () => {} : removeFromArrangement}
+            onAdd={isWorkspaceLocked ? () => {} : addToArrangement}
+            onMove={isWorkspaceLocked ? () => {} : moveInArrangement}
+            onRemove={isWorkspaceLocked ? () => {} : removeFromArrangement}
             onPlay={arrangementPlayback.start}
             onStop={arrangementPlayback.stop}
             onSeek={arrangementPlayback.seek}
-            readOnly={isReadOnly}
+            readOnly={isWorkspaceLocked}
           />
         )}
       </div>

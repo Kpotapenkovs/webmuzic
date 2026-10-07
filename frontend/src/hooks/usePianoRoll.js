@@ -6,6 +6,7 @@ export default function usePianoRoll({ bpm, cellWidth, totalBeats, gridRows, not
   const [isPlaying, setIsPlaying] = useState(false);
   const animationRef = useRef(null);
   const playheadRef = useRef(0);
+  const lastPositionUpdateRef = useRef(0);
   const notesRef = useRef(notes);
   const lastStepRef = useRef(-1);
   const bpmRef = useRef(bpm);
@@ -17,22 +18,25 @@ export default function usePianoRoll({ bpm, cellWidth, totalBeats, gridRows, not
   useEffect(() => { bpmRef.current = bpm; }, [bpm]);
 
   useEffect(() => {
-    playheadRef.current = playheadX;
-  }, [playheadX]);
-
-  useEffect(() => {
     onPlayheadChangeRef.current = onPlayheadChange;
     onBeatChangeRef.current = onBeatChange;
   }, [onPlayheadChange, onBeatChange]);
 
   const loopEnd = () => {
-    return Math.min(totalBeats * cellWidth, getPatternLength(notes) * cellWidth);
+    return Math.min(totalBeats * cellWidth, getPatternLength(notesRef.current) * cellWidth);
+  };
+
+  const seek = (nextPosition) => {
+    const position = Math.max(0, Math.min(loopEnd(), nextPosition));
+    playheadRef.current = position;
+    lastStepRef.current = Math.floor(position / (cellWidth / 2)) - 1;
+    setPlayheadX(position);
+    onPlayheadChangeRef.current?.(position);
   };
 
   const start = () => {
     cancelAnimationFrame(animationRef.current);
     setIsPlaying(true);
-    lastStepRef.current = -1;
     let previousTime;
     const animate = (time) => {
       const delta = previousTime ? time - previousTime : 0;
@@ -40,10 +44,9 @@ export default function usePianoRoll({ bpm, cellWidth, totalBeats, gridRows, not
       const nextPosition = playheadRef.current + (cellWidth * bpmRef.current * delta) / 60000;
       const next = nextPosition >= loopEnd() ? 0 : nextPosition;
       const step = Math.floor(next / (cellWidth / 2));
-      const beat = Math.floor(step / 2);
       const playStep = (stepToPlay) => {
         notesRef.current.filter((note) => Math.round(note.beat * 2) === stepToPlay).forEach((note) => onNotePlay?.(note.row));
-        if (stepToPlay % 2 === 0) onBeatChangeRef.current?.(stepToPlay / 2);
+        onBeatChangeRef.current?.(stepToPlay);
       };
 
       if (lastStepRef.current < 0 || step < lastStepRef.current) {
@@ -54,11 +57,14 @@ export default function usePianoRoll({ bpm, cellWidth, totalBeats, gridRows, not
       lastStepRef.current = step;
 
       playheadRef.current = next;
-      setPlayheadX(next);
+      if (time - lastPositionUpdateRef.current >= 100) {
+        lastPositionUpdateRef.current = time;
+        setPlayheadX(next);
+      }
       onPlayheadChangeRef.current?.(next);
       animationRef.current = requestAnimationFrame(animate);
     };
-    animationRef.current = requestAnimationFrame(animate);
+    animate(performance.now());
   };
 
   const pause = () => {
@@ -68,6 +74,7 @@ export default function usePianoRoll({ bpm, cellWidth, totalBeats, gridRows, not
   const stop = () => {
     pause();
     playheadRef.current = 0;
+    lastStepRef.current = -1;
     setPlayheadX(0);
     onPlayheadChangeRef.current?.(0);
     onBeatChangeRef.current?.(-1);
@@ -84,7 +91,7 @@ export default function usePianoRoll({ bpm, cellWidth, totalBeats, gridRows, not
     const id = `note-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     if (notes.some((note) => note.row === row && beat < note.beat + (note.length || 1) && beat >= note.beat)) return;
     onNoteAdd?.(row);
-    onNotesChange([...notes, { id, row, beat, length: 0.5 }]);
+    onNotesChange([...notes, { id, row, beat, length: 1 }]);
   };
 
   const removeNote = (event, cellWidthValue, cellHeight) => {
@@ -102,5 +109,5 @@ export default function usePianoRoll({ bpm, cellWidth, totalBeats, gridRows, not
 
   useEffect(() => () => cancelAnimationFrame(animationRef.current), []);
 
-  return { notes, playheadX, setPlayheadX, isPlaying, addNote, removeNote, moveNote, start, pause, stop };
+  return { notes, playheadX, seek, isPlaying, addNote, removeNote, moveNote, start, pause, stop };
 }

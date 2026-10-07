@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $project->title }} | WebMuzic</title>
-    @vite('resources/css/publication.css')
+    @vite(['resources/css/navbar.css', 'resources/css/publication.css'])
 
 </head>
 <body>
+    @include('components.navbar')
     <main class="page">
         <a class="back" href="{{ route('publications.index') }}"><span aria-hidden="true">←</span> Visas publikācijas</a>
 
@@ -30,22 +31,27 @@
         <section class="ratings" aria-labelledby="rating-title">
             <div class="ratings-heading">
                 <h2 id="rating-title">Vērtējums</h2>
+                <div class="rating-summary" aria-label="Vidējais vērtējums: {{ $ratingAverage !== null ? number_format($ratingAverage, 1) : '—' }} no 5, {{ $ratingCount }} vērtējumi">
+                    <span class="rating-summary-stars" aria-hidden="true" style="--rating-fill: {{ $ratingAverage !== null ? $ratingAverage * 20 : 0 }}%">★★★★★</span>
+                    <span>{{ $ratingAverage !== null ? number_format($ratingAverage, 1) : '—' }} / 5</span>
+                    <span class="rating-voter-total">{{ $ratingCount }} vērt.</span>
+                </div>
             </div>
             @auth
                 <form class="rating-form" method="POST" action="{{ route('publications.rating.store', $project) }}">
                     @csrf
                     @method('PUT')
-                    <fieldset class="star-picker" style="margin:0;padding:0;border:0;">
+                    <fieldset class="star-picker">
                         <div class="rating-choice-row">
-                            <span class="rating-voter-count" aria-label="Vērtētāju skaits">{{ $ratingCount }}</span>
-                            <div class="stars" role="radiogroup" aria-label="Vērtējums no 1 līdz 5 zvaigznēm" style="display:inline-flex;flex-direction:row-reverse;justify-content:flex-end;">
+                            <div class="stars" role="radiogroup" aria-label="Vērtējums no 1 līdz 5 zvaigznēm">
                             @for ($stars = 5; $stars >= 1; $stars--)
-                                <input id="rating-{{ $stars }}" type="radio" name="stars" value="{{ $stars }}" @checked((int) old('stars', $userRating) === $stars) onchange="this.form.requestSubmit()" required style="position:absolute;width:1px;height:1px;opacity:0;">
-                                <label for="rating-{{ $stars }}" aria-label="{{ $stars }} no 5 zvaigznēm" style="color:{{ $stars <= (int) old('stars', $userRating ?? 0) ? '#b8e56d' : '#566158' }};">★</label>
+                                <input id="rating-{{ $stars }}" type="radio" name="stars" value="{{ $stars }}" @checked((int) old('stars', $userRating) === $stars) required>
+                                <label for="rating-{{ $stars }}" aria-label="{{ $stars }} no 5 zvaigznēm">★</label>
                             @endfor
                             </div>
                         </div>
                     </fieldset>
+                    <button class="rating-submit" type="submit">Saglabāt vērtējumu</button>
                     @error('stars') <span class="error">{{ $message }}</span> @enderror
                 </form>
             @else

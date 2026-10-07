@@ -1,7 +1,10 @@
 .patternPlaylist { 
+  display: flex;
   width: 300px;
   max-height: none;
   min-height: 0; padding: 18px 24px;
+  flex-direction: column;
+  overflow: hidden;
   background: #171b18;
   text-align: left; 
   }
@@ -18,7 +21,7 @@
 .playlistHeader h2 { margin: 7px 0 0; color: #edf3ee; font: 400 25px/1 Georgia, serif; }
 .addPatternButton { width: 29px; height: 29px; border: 1px solid #536254; border-radius: 3px; color: #b7e56d96; background: transparent; cursor: pointer; font-size: 21px; line-height: 20px; }
 .addPatternButton:hover { background: #2b382c; }
-.patternList { display: flex; max-height: calc(100% - 78px); flex-direction: column; gap: 6px; overflow-y: auto; padding-top: 10px; }
+.patternList { display: flex; min-height: 0; flex: 1; flex-direction: column; gap: 6px; overflow-y: auto; overscroll-behavior: contain; padding-top: 10px; }
 .patternItem { display: flex; align-items: center; border-left: 2px solid transparent; opacity: 0.6; }
 .patternItem.selected { border-left-color: #b7e56d6e; background: #222c23; }
 .patternSelect { min-width: 0; flex: 1; display: flex; align-items: center; gap: 10px; padding: 13px 8px; border: 0; color: #afbbb1; background: transparent; cursor: pointer; text-align: left; }
@@ -26,7 +29,8 @@
 .patternIndex { color: #738175; font: 10px ui-monospace, monospace; }
 .patternName { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
 .noteCount { margin-left: auto; color: #718073; font: 10px ui-monospace, monospace; }
-.patternSelect input { min-width: 0; width: 100%; border: 1px solid #607060; color: #eef5ee; background: #182019; font-size: 12px; }
+.patternRename { min-width: 0; flex: 1; display: flex; align-items: center; gap: 10px; padding: 13px 8px; }
+.patternRename input { min-width: 0; width: 100%; border: 1px solid #607060; color: #eef5ee; background: #182019; font-size: 12px; }
 .patternActions { display: flex; gap: 2px; padding-right: 5px; opacity: 0; }
 .patternItem:hover .patternActions, .patternItem.selected .patternActions { opacity: 1; }
 .patternActions button { border: 0; color: #829184; background: transparent; cursor: pointer; font: 10px ui-monospace, monospace; }

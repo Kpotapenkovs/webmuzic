@@ -4,8 +4,9 @@ import { getCsrfToken } from "./useSessionUser";
 const DEFAULT_PROJECT_TITLE = "Nenosaukts projekts";
 
 export default function useProjectPersistence(workspace) {
+  const { loadProject } = workspace;
   const [project, setProject] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(() => Boolean(new URLSearchParams(window.location.search).get("project")));
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -16,8 +17,6 @@ export default function useProjectPersistence(workspace) {
     }
 
     let isCancelled = false;
-    setIsLoading(true);
-
     const isPublicView = new URLSearchParams(window.location.search).get("readonly") === "1";
     fetch(isPublicView ? `/publications/${projectId}/data` : `/projects/${projectId}`, {
       credentials: "include",
@@ -35,7 +34,7 @@ export default function useProjectPersistence(workspace) {
           return;
         }
 
-        workspace.loadProject(loadedProject.data);
+        loadProject(loadedProject.data);
         setProject(loadedProject);
       })
       .catch((error) => {
@@ -52,7 +51,7 @@ export default function useProjectPersistence(workspace) {
     return () => {
       isCancelled = true;
     };
-  }, []);
+  }, [loadProject]);
 
   const save = useCallback(async (title) => {
     setIsSaving(true);

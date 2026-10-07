@@ -1,17 +1,26 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 export default function useNoteSound(volume) {
   const audioContextRef = useRef(null);
   const volumeRef = useRef(volume);
-  volumeRef.current = volume;
 
-  return (row) => {
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
+
+  const prepareAudio = () => {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
+    if (!AudioContext) return null;
 
     const context = audioContextRef.current || new AudioContext();
     audioContextRef.current = context;
     if (context.state === "suspended") context.resume();
+    return context;
+  };
+
+  const playNote = (row) => {
+    const context = prepareAudio();
+    if (!context) return;
 
     const midi = 108 - row;
     const oscillator = context.createOscillator();
@@ -28,5 +37,11 @@ export default function useNoteSound(volume) {
     gain.connect(context.destination);
     oscillator.start(now);
     oscillator.stop(now + 0.35);
+    oscillator.onended = () => {
+      oscillator.disconnect();
+      gain.disconnect();
+    };
   };
+
+  return { playNote, prepareAudio };
 }

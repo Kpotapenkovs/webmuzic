@@ -4,36 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mani projekti | WebMuzic</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/navbar.css', 'resources/js/app.js'])
     @vite('resources/css/projects.css')
 
 </head>
 <body class="min-w-80 bg-[#111412] font-sans text-[#e8eee9] antialiased">
+    @include('components.navbar')
     <main class="projects-page">
-        <header class="projects-header">
-            <div>
-                <p class="font-mono text-[10px] tracking-[0.15em] text-[#8d9b91]">WEBMUZIC / DARBA VIETA</p>
-                <h1 class="mt-1 font-serif text-xl font-semibold leading-tight text-[#edf3ee]">Mani projekti</h1>
-            </div>
-            <details class="account-menu">
-                <summary>
-                    <span class="account-avatar">{{ strtoupper(mb_substr(auth()->user()->username, 0, 1)) }}</span>
-                    {{ auth()->user()->username }}
-                    <span class="text-[#8d9b91]" aria-hidden="true">⌄</span>
-                </summary>
-                <form method="POST" action="{{ route('session.logout') }}" class="logout-form">
-                    @csrf
-                    <button type="submit" class="logout-button">Iziet no konta</button>
-                </form>
-            </details>
-        </header>
-
         <section class="projects-main" aria-labelledby="projects-heading">
             <div class="projects-intro">
-                <div>
-                    <h2 id="projects-heading">Saglabātie projekti</h2>
-                </div>
-                <a class="publications-button" href="{{ route('publications.index') }}">Publikācijas <span aria-hidden="true">→</span></a>
+                <h2 id="projects-heading">Saglabātie projekti</h2>
             </div>
 
             <p class="projects-count">{{ $projects->count() }} {{ $projects->count() === 1 ? 'PROJEKTS' : 'PROJEKTI' }}</p>

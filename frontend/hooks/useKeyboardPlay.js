@@ -15,15 +15,21 @@ export default function useKeyboardPlay({ onNoteOn, onNoteOff, volume = 1 }) {
   const pressed = useRef(new Set());
   const volumeRef = useRef(volume);
   const callbacksRef = useRef({ onNoteOn, onNoteOff });
-  volumeRef.current = volume;
-  callbacksRef.current = { onNoteOn, onNoteOff };
 
   useEffect(() => {
-    if (!audioCtxRef.current) {
-      audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
-    }
+    volumeRef.current = volume;
+    callbacksRef.current = { onNoteOn, onNoteOff };
+  }, [volume, onNoteOn, onNoteOff]);
 
-    const ctx = audioCtxRef.current;
+  useEffect(() => {
+    const getAudioContext = () => {
+      if (!audioCtxRef.current) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return null;
+        audioCtxRef.current = new AudioContext();
+      }
+      return audioCtxRef.current;
+    };
 
     const getFrequency = (note) => {
       return 440 * Math.pow(2, (note - 9) / 12);
@@ -42,6 +48,8 @@ export default function useKeyboardPlay({ onNoteOn, onNoteOff, volume = 1 }) {
       if (note === undefined) return;
       e.preventDefault();
 
+      const ctx = getAudioContext();
+      if (!ctx) return;
       pressed.current.add(key);
 
       if (ctx.state === "suspended") {
@@ -59,6 +67,10 @@ export default function useKeyboardPlay({ onNoteOn, onNoteOff, volume = 1 }) {
 
       osc.connect(gain);
       gain.connect(ctx.destination);
+      osc.onended = () => {
+        osc.disconnect();
+        gain.disconnect();
+      };
 
       osc.start();
 
@@ -78,6 +90,8 @@ export default function useKeyboardPlay({ onNoteOn, onNoteOff, volume = 1 }) {
       const active = activeNotes.current[key];
       if (!active) return;
 
+      const ctx = audioCtxRef.current;
+      if (!ctx) return;
       const { osc, gain } = active;
       const now = ctx.currentTime;
 
@@ -93,6 +107,12 @@ export default function useKeyboardPlay({ onNoteOn, onNoteOff, volume = 1 }) {
     };
 
     const releaseActiveNotes = () => {
+      const ctx = audioCtxRef.current;
+      if (!ctx) {
+        pressed.current.clear();
+        return;
+      }
+
       Object.entries(activeNotes.current).forEach(([key, { osc, gain }]) => {
         try {
           const now = ctx.currentTime;
@@ -118,6 +138,8 @@ export default function useKeyboardPlay({ onNoteOn, onNoteOff, volume = 1 }) {
       window.removeEventListener("blur", releaseActiveNotes);
       document.removeEventListener("visibilitychange", releaseActiveNotes);
       releaseActiveNotes();
+      audioCtxRef.current?.close().catch(() => {});
+      audioCtxRef.current = null;
     };
   }, []);
 }

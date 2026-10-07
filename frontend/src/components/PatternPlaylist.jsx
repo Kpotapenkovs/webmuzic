@@ -15,14 +15,19 @@ export default function PatternPlaylist({ patterns, selectedPatternId, isEditorO
       </div>
       <div className="patternList">
         {patterns.map((pattern, index) => (
-          <div className={`patternItem ${pattern.id === selectedPatternId ? "selected" : ""}`} onContextMenu={readOnly ? undefined : (event) => { event.preventDefault(); onDelete(pattern.id); }} key={pattern.id}>
-            <button className="patternSelect" type="button" aria-expanded={pattern.id === selectedPatternId ? isEditorOpen : false} onClick={() => onSelect(pattern.id)}>
-              <span className="patternIndex">{String(index + 1).padStart(2, "0")}</span>
-              {editingId === pattern.id ? (
-                <input autoFocus defaultValue={pattern.name} onBlur={(event) => { onRename(pattern.id, event.target.value); setEditingId(null); }} onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); }} />
-              ) : <span className="patternName">{pattern.name}</span>}
-              <span className="noteCount">{pattern.notes.length}</span>
-            </button>
+          <div className={`patternItem ${pattern.id === selectedPatternId ? "selected" : ""}`} key={pattern.id}>
+            {editingId === pattern.id ? (
+              <div className="patternRename">
+                <span className="patternIndex">{String(index + 1).padStart(2, "0")}</span>
+                <input autoFocus defaultValue={pattern.name} aria-label={`Rename ${pattern.name}`} onBlur={(event) => { onRename(pattern.id, event.target.value); setEditingId(null); }} onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); }} />
+              </div>
+            ) : (
+              <button className="patternSelect" type="button" aria-expanded={pattern.id === selectedPatternId ? isEditorOpen : false} onClick={() => onSelect(pattern.id)}>
+                <span className="patternIndex">{String(index + 1).padStart(2, "0")}</span>
+                <span className="patternName">{pattern.name}</span>
+                <span className="noteCount">{pattern.notes.length}</span>
+              </button>
+            )}
             {!readOnly && <div className="patternActions">
               <button type="button" onClick={() => setEditingId(pattern.id)} aria-label={`Rename ${pattern.name}`}>Edit</button>
               <button type="button" onClick={() => onExtend(pattern.id)} aria-label={`Extend ${pattern.name}`}>+4</button>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const DEFAULT_PATTERN = { id: "pattern-1", name: "Pattern 1", notes: [] };
 
@@ -36,21 +36,22 @@ export default function usePatternStorage() {
   const renamePattern = (id, name) => {
     const cleanName = name.trim();
     if (!cleanName) return;
-    setPatterns((current) => {
-      const duplicateName = current.some((pattern) => pattern.id !== id
-        && pattern.name.trim().toLocaleLowerCase() === cleanName.toLocaleLowerCase());
-      if (duplicateName) return current;
-      return current.map((pattern) => pattern.id === id ? { ...pattern, name: cleanName } : pattern);
-    });
+    const patternToRename = patterns.find((pattern) => pattern.id === id);
+    if (!patternToRename || patternToRename.name === cleanName) return;
+    const duplicateName = patterns.some((pattern) => pattern.id !== id
+      && pattern.name.trim().toLocaleLowerCase() === cleanName.toLocaleLowerCase());
+    if (duplicateName) return;
+
+    setPatterns((current) => current.map((pattern) => pattern.id === id ? { ...pattern, name: cleanName } : pattern));
     setHasUnsavedChanges(true);
   };
   const deletePattern = (id) => {
-    setPatterns((current) => {
-      if (current.length === 1) return current;
-      const next = current.filter((pattern) => pattern.id !== id);
-      if (id === selectedPatternId) setSelectedPatternId(next[0].id);
-      return next;
-    });
+    if (patterns.length === 1 || !patterns.some((pattern) => pattern.id === id)) return;
+
+    const nextPatterns = patterns.filter((pattern) => pattern.id !== id);
+    setPatterns(nextPatterns);
+    setArrangement((current) => current.filter((clip) => clip.patternId !== id));
+    if (id === selectedPatternId) setSelectedPatternId(nextPatterns[0].id);
     setHasUnsavedChanges(true);
   };
   const updatePatternNotes = (id, notes) => {
@@ -87,7 +88,7 @@ export default function usePatternStorage() {
     setHasUnsavedChanges(true);
   };
 
-  const loadProject = (projectData, isDirty = false) => {
+  const loadProject = useCallback((projectData, isDirty = false) => {
     const nextPatterns = Array.isArray(projectData.patterns) && projectData.patterns.length > 0
       ? projectData.patterns
       : [DEFAULT_PATTERN];
@@ -97,7 +98,7 @@ export default function usePatternStorage() {
     setSelectedPatternId(selectedPatternExists ? projectData.selectedPatternId : nextPatterns[0].id);
     setArrangement(Array.isArray(projectData.arrangement) ? projectData.arrangement : []);
     setHasUnsavedChanges(isDirty);
-  };
+  }, []);
 
   const markSaved = () => setHasUnsavedChanges(false);
 

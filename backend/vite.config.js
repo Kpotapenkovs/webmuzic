@@ -8,6 +8,7 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
+                'resources/css/navbar.css',
                 'resources/css/projects.css',
                 'resources/css/publications.css',
                 'resources/css/publication.css',

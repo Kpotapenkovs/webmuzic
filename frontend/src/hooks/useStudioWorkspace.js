@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import usePatternStorage from "./usePatternStorage";
 import useArrangementPlayback from "./useArrangementPlayback";
 import useNoteSound from "./useNoteSound";
@@ -27,7 +27,7 @@ export default function useStudioWorkspace() {
     markSaved,
   } = patternStorage;
   const selectedPattern = patterns.find((pattern) => pattern.id === selectedPatternId) || patterns[0];
-  const playNote = useNoteSound(volume);
+  const { playNote, prepareAudio } = useNoteSound(volume);
   const [activeBeat, setActiveBeat] = useState(-1);
   const pianoRollPlayback = usePianoRoll({
     bpm,
@@ -43,7 +43,8 @@ export default function useStudioWorkspace() {
   const arrangementPlayback = useArrangementPlayback({ bpm, patterns, arrangement, onNotePlay: playNote });
 
   const handleBpmChange = (value) => {
-    setBpm(Math.max(MIN_BPM, Math.min(MAX_BPM, Number(value) || MIN_BPM)));
+    const normalizedBpm = Math.round(Number(value) || MIN_BPM);
+    setBpm(Math.max(MIN_BPM, Math.min(MAX_BPM, normalizedBpm)));
   };
 
   const handlePatternClick = (patternId) => {
@@ -57,13 +58,15 @@ export default function useStudioWorkspace() {
   };
   const openPianoRoll = () => setIsPianoRollOpen(true);
 
-  const loadProject = (projectData, isDirty = false) => {
-    setBpm(Math.max(MIN_BPM, Math.min(MAX_BPM, Number(projectData.bpm) || DEFAULT_BPM)));
+  const loadProject = useCallback((projectData, isDirty = false) => {
+    const normalizedBpm = Math.round(Number(projectData.bpm) || DEFAULT_BPM);
+    setBpm(Math.max(MIN_BPM, Math.min(MAX_BPM, normalizedBpm)));
     loadPatternProject(projectData, isDirty);
     setIsPianoRollOpen(false);
-  };
+  }, [loadPatternProject]);
 
   const startPlayback = () => {
+    prepareAudio();
     if (isPianoRollOpen) {
       arrangementPlayback.stop();
       pianoRollPlayback.start();
@@ -88,7 +91,7 @@ export default function useStudioWorkspace() {
   });
   const arrangementPatternPosition = activeClip ? arrangementPlayback.position - activeClip.startBeat : 0;
   const pianoRollViewPlayback = arrangementPlayback.isPlaying && !pianoRollPlayback.isPlaying
-    ? { ...pianoRollPlayback, playheadX: arrangementPatternPosition * 60, activeBeat: activeClip ? Math.floor(arrangementPatternPosition) : -1 }
+    ? { ...pianoRollPlayback, playheadX: arrangementPatternPosition * 60, activeBeat: activeClip ? Math.floor(arrangementPatternPosition * 2) : -1 }
     : { ...pianoRollPlayback, activeBeat };
 
   return {

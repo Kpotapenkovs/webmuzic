@@ -2,3 +2,8 @@
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; }
 button, input { font: inherit; }
+.rollViewport, .timelineScroll, .patternList { scrollbar-color: #647c4b #171d18; scrollbar-width: thin; }
+.rollViewport::-webkit-scrollbar, .timelineScroll::-webkit-scrollbar, .patternList::-webkit-scrollbar { width: 9px; height: 9px; }
+.rollViewport::-webkit-scrollbar-track, .timelineScroll::-webkit-scrollbar-track, .patternList::-webkit-scrollbar-track { background: #171d18; }
+.rollViewport::-webkit-scrollbar-thumb, .timelineScroll::-webkit-scrollbar-thumb, .patternList::-webkit-scrollbar-thumb { border: 2px solid #171d18; border-radius: 8px; background: #647c4b; }
+.rollViewport::-webkit-scrollbar-thumb:hover, .timelineScroll::-webkit-scrollbar-thumb:hover, .patternList::-webkit-scrollbar-thumb:hover { background: #b8e56d; }

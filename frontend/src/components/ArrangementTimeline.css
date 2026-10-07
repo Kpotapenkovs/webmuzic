@@ -3,6 +3,7 @@
 .arrangementHeader h2 { margin: 5px 0 0; color: #edf3ee; font: 400 23px/1 Georgia, serif; }
 .arrangementActions { display: flex; gap: 14px; align-items: center; color: #718073; font: 10px ui-monospace, monospace; }
 .arrangementPlay { padding: 9px 12px; border: 1px solid #b8e56d; border-radius: 3px; color: #172016; background: #b8e56d; cursor: pointer; font: 600 11px ui-monospace, monospace; }
+.arrangementScrubber { padding: 8px 18px; border-bottom: 1px solid #2a312c; }
 .arrangementBody { display: flex; min-height: 0; flex: 1; }
 .arrangementSources { width: 230px; flex: 0 0 230px; padding: 12px; border-right: 1px solid #2a312c; }
 .sourceLabel { display: block; margin: 0 4px 8px; color: #68766c; font: 9px ui-monospace, monospace; }
@@ -13,9 +14,9 @@
 .timelineScroll { min-width: 0; min-height: 0; overflow: auto; flex: 1; overscroll-behavior: contain; }
 .timelineScale, .arrangementGrid { position: relative; min-width: 15600px; }
 .timelineScale { height: 27px; display: grid; grid-auto-columns: 52px; grid-auto-flow: column; border-bottom: 1px solid #2f3a31; color: #718073; font: 9px ui-monospace, monospace; user-select: none; }
-.timelineScale span { padding: 7px 5px; border-right: 1px solid #2b382e; user-select: none; }
+.timelineScale span { padding: 7px 5px; border-right: 1px solid #2b382e; user-select: none; content-visibility: auto; contain-intrinsic-size: 52px 27px; }
 .arrangementGrid { height: 768px; display: grid; grid-auto-columns: 52px; grid-auto-flow: column; background: #1c241e; }
-.arrangementGrid > span { border-right: 1px solid #2b382e; }
+.arrangementGrid > span { border-right: 1px solid #2b382e; content-visibility: auto; contain-intrinsic-size: 52px 768px; }
 .arrangementGrid > span.bar { border-right-color: #526254; }
 .trackLane { position: absolute; left: 0; right: 0; z-index: 1; height: 64px; padding: 5px 7px; border-top: 1px solid #354239; color: #68766c; font: 9px ui-monospace, monospace; pointer-events: none; }
 .trackLane span { position: sticky; left: 7px; }
@@ -29,5 +30,6 @@
 .clipDelete { position: absolute; top: 4px; right: 5px; color: #34452e; font: 16px/1 sans-serif; cursor: pointer; }
 .clipDelete:hover { color: #172016; }
 .arrangementPlayhead { position: absolute; top: 0; bottom: 0; z-index: 3; width: 8px; margin-left: -3px; background: #b8e56d; box-shadow: 0 0 9px #b7e56d85; cursor: ew-resize; }
+.arrangementPlayhead.playing { transition: left 100ms linear; }
 .arrangementHint { margin: 0; padding: 8px 18px; border-top: 1px solid #2a312c; color: #647168; font: 10px ui-monospace, monospace; }
 @media (max-width: 700px) { .arrangementPanel { height: auto; margin: 12px 14px 0; } .arrangementHeader { align-items: flex-start; } .arrangementSources { width: 150px; flex-basis: 150px; } .arrangementActions { flex-direction: column; gap: 6px; align-items: flex-end; } }

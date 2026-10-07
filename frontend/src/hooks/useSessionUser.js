@@ -18,8 +18,6 @@ export default function useSessionUser() {
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshUser = useCallback(async () => {
-    setIsLoading(true);
-
     try {
       const response = await fetch("/session/user", {
         credentials: "include",
@@ -27,14 +25,12 @@ export default function useSessionUser() {
       });
 
       if (!response.ok) {
-        setUser(null);
         return;
       }
 
       const payload = await response.json();
       setUser(payload.user);
     } catch {
-      setUser(null);
     } finally {
       setIsLoading(false);
     }

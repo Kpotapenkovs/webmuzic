@@ -4,17 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Publikācijas | WebMuzic</title>
-    @vite('resources/css/publications.css')
+    @vite(['resources/css/navbar.css', 'resources/css/publications.css'])
 
 </head>
 <body>
+    @include('components.navbar')
     <main class="page">
         <div class="topline">
-            @auth
-                <a class="back" href="{{ route('home') }}"><span aria-hidden="true">←</span> Mani projekti</a>
-            @else
+            @guest
                 <a class="back" href="{{ route('login.index') }}"><span aria-hidden="true">←</span> Pieslēgties</a>
-            @endauth
+            @endguest
             <span class="brand">WEBMUZIC / COMMUNITY</span>
         </div>
 
@@ -37,7 +36,7 @@
                         <div class="project-top"><span class="published-tag">Publicēts</span><time class="project-date" datetime="{{ $project->published_at->toIso8601String() }}">{{ $project->published_at->format('Y-m-d · H:i') }}</time></div>
                         <h2>{{ $project->title }}</h2>
                         <p class="author">Autors {{ $project->user->username }}</p>
-                        @php($ratingPercent = $project->ratings_avg_stars ? ($project->ratings_avg_stars) * 100 : 0)
+                        @php($ratingPercent = $project->ratings_avg_stars ? ($project->ratings_avg_stars) * 20 : 0)
                         <div class="project-rating" aria-label="Vidējais vērtējums: {{ $project->ratings_avg_stars ? number_format($project->ratings_avg_stars, 1) : '0.0' }} no 5, {{ $project->ratings_count }} vērtētāji">
                             <span class="rating-stars" aria-hidden="true" style="--rating-fill: {{ $ratingPercent }}%">★★★★★</span>
                             <span class="rating-average">{{ $project->ratings_avg_stars ? number_format($project->ratings_avg_stars, 1) : '—' }} / 5</span>

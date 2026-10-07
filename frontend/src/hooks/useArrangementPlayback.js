@@ -8,6 +8,7 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
   const frameRef = useRef(null);
   const positionRef = useRef(0);
   const lastStepRef = useRef(-1);
+  const lastPositionUpdateRef = useRef(0);
   const bpmRef = useRef(bpm);
   const playbackDataRef = useRef({ end: 0, notesByBeat: new Map() });
 
@@ -86,10 +87,13 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
         playbackDataRef.current.notesByBeat.get(stepToPlay)?.forEach((note) => onNotePlay(note.row));
       }
       positionRef.current = currentPosition;
-      setPosition(currentPosition);
+      if (time - lastPositionUpdateRef.current >= 100 || reachedEnd) {
+        lastPositionUpdateRef.current = time;
+        setPosition(currentPosition);
+      }
       frameRef.current = requestAnimationFrame(animate);
     };
-    frameRef.current = requestAnimationFrame(animate);
+    animate(performance.now());
   };
 
   useEffect(() => () => cancelAnimationFrame(frameRef.current), []);
