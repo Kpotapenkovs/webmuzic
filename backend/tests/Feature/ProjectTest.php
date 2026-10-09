@@ -57,6 +57,23 @@ class ProjectTest extends TestCase
         $this->assertSame(128, $project->refresh()->data['bpm']);
     }
 
+    public function test_project_accepts_half_beat_note_lengths(): void
+    {
+        $user = User::factory()->create();
+        $payload = $this->projectPayload();
+        $payload['data']['patterns'][0]['notes'] = [[
+            'id' => 'note-half-beat',
+            'row' => 60,
+            'beat' => 1.5,
+            'length' => 0.5,
+        ]];
+
+        $this->actingAs($user)
+            ->postJson(route('projects.store'), $payload)
+            ->assertCreated()
+            ->assertJsonPath('project.data.patterns.0.notes.0.length', 0.5);
+    }
+
     public function test_user_cannot_access_or_update_another_users_project(): void
     {
         $user = User::factory()->create();
@@ -81,6 +98,30 @@ class ProjectTest extends TestCase
             ->postJson(route('projects.store'), [])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['title', 'data']);
+    }
+
+    public function test_project_rejects_invalid_nested_note_and_arrangement_data(): void
+    {
+        $user = User::factory()->create();
+
+        $payload = $this->projectPayload();
+        $payload['data']['patterns'][0]['notes'] = [[
+            'id' => 'note-1',
+            'row' => 60,
+            'beat' => -1,
+            'length' => 0,
+        ]];
+        $payload['data']['arrangement'] = [[
+            'id' => 'clip-1',
+            'patternId' => 'missing-pattern',
+            'startBeat' => -1,
+            'track' => -1,
+        ]];
+
+        $this->actingAs($user)
+            ->postJson(route('projects.store'), $payload)
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['data.patterns.0.notes.0.beat', 'data.patterns.0.notes.0.length', 'data.arrangement.0.patternId', 'data.arrangement.0.startBeat', 'data.arrangement.0.track']);
     }
 
     /**
