@@ -28,7 +28,7 @@ class AuthenticationTest extends TestCase
 
         $this->actingAs($user)
             ->get(route('home'))
-            ->assertSee('Projekti');
+            ->assertSee('Mani projekti');
     }
 
     public function test_valid_registration_creates_and_authenticates_user(): void
