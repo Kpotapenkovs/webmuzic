@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { getPatternLength } from "../utils/patternTiming";
+import { BEATS_PER_BAR, getPatternLength } from "../utils/patternTiming";
 import { MAX_TIMELINE_BEATS } from "../config/studio";
 
 export default function useArrangementPlayback({ bpm, patterns, arrangement, onNotePlay }) {
@@ -8,7 +8,6 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
   const frameRef = useRef(null);
   const positionRef = useRef(0);
   const lastStepRef = useRef(-1);
-  const lastPositionUpdateRef = useRef(0);
   const bpmRef = useRef(bpm);
   const playbackDataRef = useRef({ end: 0, notesByBeat: new Map() });
 
@@ -33,7 +32,13 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
       });
     });
 
-    playbackDataRef.current = { end, notesByBeat };
+    const playbackEnd = Math.ceil(end / BEATS_PER_BAR) * BEATS_PER_BAR;
+    playbackDataRef.current = { end: playbackEnd, notesByBeat };
+    const maxPosition = playbackEnd || MAX_TIMELINE_BEATS;
+    if (positionRef.current > maxPosition) {
+      positionRef.current = maxPosition;
+      setPosition(maxPosition);
+    }
   }, [patterns, arrangement]);
 
   const getEnd = () => playbackDataRef.current.end;
@@ -50,47 +55,58 @@ export default function useArrangementPlayback({ bpm, patterns, arrangement, onN
     setIsPlaying(false);
   };
   const seek = (nextPosition) => {
-    const position = Math.max(0, Math.min(MAX_TIMELINE_BEATS, nextPosition));
+    const maxPosition = getEnd() || MAX_TIMELINE_BEATS;
+    const position = Math.max(0, Math.min(maxPosition, nextPosition));
     positionRef.current = position;
     lastStepRef.current = -1;
     setPosition(position);
   };
   const start = () => {
     cancelAnimationFrame(frameRef.current);
-    if (!getEnd()) return;
-    if (positionRef.current >= getEnd()) {
+    const end = getEnd();
+    if (!end) return;
+
+    if (positionRef.current >= end) {
       positionRef.current = 0;
       lastStepRef.current = -1;
       setPosition(0);
     }
+
     setIsPlaying(true);
     let previousTime;
     const animate = (time) => {
       const delta = previousTime ? time - previousTime : 0;
       previousTime = time;
-      const end = getEnd();
       const next = positionRef.current + (bpmRef.current * delta) / 60000;
-      const reachedEnd = next >= end;
-      const currentPosition = reachedEnd ? next % end : next;
+      const endPosition = getEnd();
+      const wrapped = next >= endPosition;
+      const currentPosition = wrapped ? next % endPosition : next;
+
       const step = Math.floor(currentPosition * 2);
-      if (reachedEnd && lastStepRef.current >= 0) {
-        for (let crossedStep = lastStepRef.current + 1; crossedStep < Math.ceil(end * 2); crossedStep += 1) playStep(crossedStep);
-        for (let crossedStep = 0; crossedStep <= step; crossedStep += 1) playStep(crossedStep);
+
+      if (wrapped && lastStepRef.current >= 0) {
+        for (let crossedStep = lastStepRef.current + 1; crossedStep < endPosition * 2; crossedStep += 1) {
+          playStep(crossedStep);
+        }
+        for (let crossedStep = 0; crossedStep <= step; crossedStep += 1) {
+          playStep(crossedStep);
+        }
       } else if (lastStepRef.current < 0) {
         playStep(step);
       } else if (step > lastStepRef.current) {
-        for (let crossedStep = lastStepRef.current + 1; crossedStep <= step; crossedStep += 1) playStep(crossedStep);
+        for (let crossedStep = lastStepRef.current + 1; crossedStep <= step; crossedStep += 1) {
+          playStep(crossedStep);
+        }
       }
+
       lastStepRef.current = step;
 
       function playStep(stepToPlay) {
-        playbackDataRef.current.notesByBeat.get(stepToPlay)?.forEach((note) => onNotePlay(note.row));
+        playbackDataRef.current.notesByBeat.get(stepToPlay)?.forEach((note) => onNotePlay(note));
       }
+
       positionRef.current = currentPosition;
-      if (time - lastPositionUpdateRef.current >= 100 || reachedEnd) {
-        lastPositionUpdateRef.current = time;
-        setPosition(currentPosition);
-      }
+      setPosition(currentPosition);
       frameRef.current = requestAnimationFrame(animate);
     };
     animate(performance.now());

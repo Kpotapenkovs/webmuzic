@@ -3,7 +3,23 @@
 .arrangementHeader h2 { margin: 5px 0 0; color: #edf3ee; font: 400 23px/1 Georgia, serif; }
 .arrangementActions { display: flex; gap: 14px; align-items: center; color: #718073; font: 10px ui-monospace, monospace; }
 .arrangementPlay { padding: 9px 12px; border: 1px solid #b8e56d; border-radius: 3px; color: #172016; background: #b8e56d; cursor: pointer; font: 600 11px ui-monospace, monospace; }
-.arrangementScrubber { padding: 8px 18px; border-bottom: 1px solid #2a312c; }
+.arrangementScrubber { padding: 5px 18px 7px; border-bottom: 1px solid #2a312c; }
+.arrangementScrubber .seekBarRow.scrollBarRow { height: 20px; }
+.arrangementScrubber .seekBarLabel { color: #6c7b70; font: 9px ui-monospace, monospace; }
+.arrangementScrubber .seekBar { min-width: 0; height: 10px; border-color: #39463c; background: #202920; cursor: pointer; }
+.arrangementScrubber .seekBar.scrollBarOverview { border-color: #39463c; background: #202920; }
+.arrangementScrubber .seekBar.scrollBarOverview::before { position: absolute; top: 50%; right: 0; left: 0; height: 2px; background: #858b854d; content: ""; transform: translateY(-50%); }
+.arrangementScrubber .seekOverviewItem { top: 2px; bottom: auto; height: 4px; }
+.arrangementScrubber .scrollViewportThumb { position: absolute; top: 0; z-index: 4; min-width: 8px; height: 100%; border: 1px solid #b8c0b899; border-radius: 2px; background: #a5aaa54d; cursor: grab; touch-action: none; }
+.arrangementScrubber .scrollViewportThumb:active { cursor: grabbing; }
+.arrangementScrubber .seekBeat { top: 0; }
+.playheadPositionRow { height: 13px; margin: 0 -18px; display: flex; align-items: center; }
+.playheadPositionLabel { padding-left: 18px; display: flex; flex: 0 0 230px; align-items: center; color: #6c7b70; font: 9px ui-monospace, monospace; }
+.playheadPositionInput { width: 100%; height: 6px; margin: 0; appearance: none; background: transparent; cursor: ew-resize; }
+.playheadPositionInput::-webkit-slider-runnable-track { height: 2px; border-radius: 1px; background: #858b8566; }
+.playheadPositionInput::-webkit-slider-thumb { width: 2px; height: 8px; margin-top: -3px; appearance: none; border: 0; border-radius: 1px; background: #b8e56d; }
+.playheadPositionInput::-moz-range-track { height: 2px; border-radius: 1px; background: #858b8566; }
+.playheadPositionInput::-moz-range-thumb { width: 2px; height: 8px; border: 0; border-radius: 1px; background: #b8e56d; }
 .arrangementBody { display: flex; min-height: 0; flex: 1; }
 .arrangementSources { width: 230px; flex: 0 0 230px; padding: 12px; border-right: 1px solid #2a312c; }
 .sourceLabel { display: block; margin: 0 4px 8px; color: #68766c; font: 9px ui-monospace, monospace; }
@@ -12,9 +28,10 @@
 .sourcePattern i { width: 7px; height: 7px; border-radius: 1px; background: #9bc95d; }
 .sourcePattern small { margin-left: auto; color: #718073; font: 9px ui-monospace, monospace; }
 .timelineScroll { min-width: 0; min-height: 0; overflow: auto; flex: 1; overscroll-behavior: contain; }
-.timelineScale, .arrangementGrid { position: relative; min-width: 15600px; }
+.timelineScale, .arrangementGrid { position: relative; min-width: 0; }
 .timelineScale { height: 27px; display: grid; grid-auto-columns: 52px; grid-auto-flow: column; border-bottom: 1px solid #2f3a31; color: #718073; font: 9px ui-monospace, monospace; user-select: none; }
 .timelineScale span { padding: 7px 5px; border-right: 1px solid #2b382e; user-select: none; content-visibility: auto; contain-intrinsic-size: 52px 27px; }
+.timelineScale span.bar { border-right-color: #526254; }
 .arrangementGrid { height: 768px; display: grid; grid-auto-columns: 52px; grid-auto-flow: column; background: #1c241e; }
 .arrangementGrid > span { border-right: 1px solid #2b382e; content-visibility: auto; contain-intrinsic-size: 52px 768px; }
 .arrangementGrid > span.bar { border-right-color: #526254; }
@@ -29,7 +46,8 @@
 .arrangementClip small { margin-top: 5px; font: 9px ui-monospace, monospace; opacity: .7; }
 .clipDelete { position: absolute; top: 4px; right: 5px; color: #34452e; font: 16px/1 sans-serif; cursor: pointer; }
 .clipDelete:hover { color: #172016; }
-.arrangementPlayhead { position: absolute; top: 0; bottom: 0; z-index: 3; width: 8px; margin-left: -3px; background: #b8e56d; box-shadow: 0 0 9px #b7e56d85; cursor: ew-resize; }
-.arrangementPlayhead.playing { transition: left 100ms linear; }
+.arrangementPlayhead { position: absolute; top: 0; bottom: 0; z-index: 3; width: 2px; margin-left: -1px; background: #b8e56d; box-shadow: 0 0 9px #b8e56d; cursor: ew-resize; }
+.arrangementPlayhead::before { position: absolute; top: 0; right: -5px; bottom: 0; left: -5px; content: ""; cursor: ew-resize; }
+.arrangementPlayhead { will-change: left; }
 .arrangementHint { margin: 0; padding: 8px 18px; border-top: 1px solid #2a312c; color: #647168; font: 10px ui-monospace, monospace; }
-@media (max-width: 700px) { .arrangementPanel { height: auto; margin: 12px 14px 0; } .arrangementHeader { align-items: flex-start; } .arrangementSources { width: 150px; flex-basis: 150px; } .arrangementActions { flex-direction: column; gap: 6px; align-items: flex-end; } }
+@media (max-width: 700px) { .arrangementPanel { height: auto; margin: 12px 14px 0; } .arrangementHeader { align-items: flex-start; } .arrangementSources { width: 150px; flex-basis: 150px; } .playheadPositionLabel { flex-basis: 150px; } .arrangementActions { flex-direction: column; gap: 6px; align-items: flex-end; } }

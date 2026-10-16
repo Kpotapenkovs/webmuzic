@@ -1,20 +1,21 @@
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import SeekBar from "./SeekBar";
 import useKeyboardPlay from "../../hooks/useKeyboardPlay";
 import { MAX_TIMELINE_BEATS } from "../config/studio";
-import { getPatternLength } from "../utils/patternTiming";
+import { BEATS_PER_BAR } from "../utils/patternTiming";
 import "./PianoRollEditor.css";
 
 const GRID_ROWS = 88;
 const CELL_HEIGHT = 22;
 const CELL_WIDTH = 60;
-const TOTAL_BEATS = MAX_TIMELINE_BEATS;
+const MIN_TIMELINE_BEATS = 64;
+const TIMELINE_PADDING_BEATS = 64;
 const KEYBOARD_WIDTH = 80;
 
-const PianoRollGrid = memo(function PianoRollGrid() {
+const PianoRollGrid = memo(function PianoRollGrid({ totalBeats }) {
   return <>
     {Array.from({ length: GRID_ROWS }, (_, row) => <div className={`gridRow ${getNoteName(row).includes("#") ? "darkRow" : ""}`} style={{ top: row * CELL_HEIGHT, height: CELL_HEIGHT }} key={row} />)}
-    {Array.from({ length: TOTAL_BEATS * 2 }, (_, step) => <div className={`beatLine ${step % 2 === 1 ? "subBeatLine" : Math.floor(step / 2) % 4 === 0 ? "barLine" : ""}`} style={{ left: step * (CELL_WIDTH / 2) }} key={step} />)}
+    {Array.from({ length: totalBeats * 2 }, (_, step) => <div className={`beatLine ${step % 2 === 1 ? "subBeatLine" : Math.floor(step / 2) % 4 === 0 ? "barLine" : ""}`} style={{ left: step * (CELL_WIDTH / 2) }} key={step} />)}
   </>;
 });
 
@@ -23,7 +24,10 @@ export default function PianoRollEditor({ notes, onNotesChange, playback, volume
   const [clipboard, setClipboard] = useState([]);
   const [selectionBox, setSelectionBox] = useState(null);
   const [previewNotes, setPreviewNotes] = useState(null);
+  const [horizontalScroll, setHorizontalScroll] = useState({ left: 0, max: 0, width: 0 });
   const playheadRef = useRef(null);
+  const playheadTrackRef = useRef(null);
+  const playheadMarkerRef = useRef(null);
   const rollViewportRef = useRef(null);
   const interactionRef = useRef(null);
   const noteHistoryRef = useRef([]);
@@ -33,25 +37,60 @@ export default function PianoRollEditor({ notes, onNotesChange, playback, volume
   const erasingRef = useRef(false);
   const { playheadX, seek, addNote, removeNote, activeBeat } = playback;
 
-  const totalWidth = TOTAL_BEATS * CELL_WIDTH;
-  const playbackWidth = Math.min(totalWidth, getPatternLength(notes) * CELL_WIDTH);
-  const playbackBeats = playbackWidth / CELL_WIDTH;
+  const notesEndBeat = notes.reduce((end, note) => Math.max(end, note.beat + (note.length || 1)), 0);
+  const totalBeats = Math.min(
+    MAX_TIMELINE_BEATS,
+    Math.max(MIN_TIMELINE_BEATS, Math.ceil((notesEndBeat + TIMELINE_PADDING_BEATS) / BEATS_PER_BAR) * BEATS_PER_BAR),
+  );
+  const totalWidth = totalBeats * CELL_WIDTH;
+  const visiblePlayheadPosition = Math.max(0, Math.min(horizontalScroll.width, playheadX - horizontalScroll.left));
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const transform = `translate3d(${playheadX}px, 0, 0)`;
     if (playheadRef.current) playheadRef.current.style.transform = transform;
   }, [playheadX]);
 
+  useLayoutEffect(() => {
+    const track = playheadTrackRef.current;
+    const marker = playheadMarkerRef.current;
+    if (!playheadRef.current || !track || !marker) return undefined;
+
+    let frame;
+    const syncMarker = () => {
+      const lineLeft = playheadRef.current.getBoundingClientRect().left;
+      const trackLeft = track.getBoundingClientRect().left;
+      marker.style.left = `${lineLeft - trackLeft}px`;
+      if (playback.isPlaying) frame = requestAnimationFrame(syncMarker);
+    };
+
+    syncMarker();
+    return () => cancelAnimationFrame(frame);
+  }, [horizontalScroll.left, horizontalScroll.width, playheadX, playback.isPlaying]);
+
   useEffect(() => {
     const viewport = rollViewportRef.current;
     if (!viewport) return undefined;
+    const updateScroll = () => setHorizontalScroll({
+      left: viewport.scrollLeft,
+      max: Math.max(0, viewport.scrollWidth - viewport.clientWidth),
+      width: Math.max(0, viewport.clientWidth - KEYBOARD_WIDTH),
+    });
     const handleWheel = (event) => {
       if (!event.ctrlKey) return;
       event.preventDefault();
       viewport.scrollLeft += event.deltaY || event.deltaX;
     };
+    const resizeObserver = new ResizeObserver(updateScroll);
+    resizeObserver.observe(viewport);
+    if (pianoRollRef.current) resizeObserver.observe(pianoRollRef.current);
+    viewport.addEventListener("scroll", updateScroll, { passive: true });
     viewport.addEventListener("wheel", handleWheel, { passive: false });
-    return () => viewport.removeEventListener("wheel", handleWheel);
+    updateScroll();
+    return () => {
+      resizeObserver.disconnect();
+      viewport.removeEventListener("scroll", updateScroll);
+      viewport.removeEventListener("wheel", handleWheel);
+    };
   }, []);
 
   useKeyboardPlay({ onNoteOn: () => {}, onNoteOff: () => {}, volume });
@@ -119,6 +158,9 @@ export default function PianoRollEditor({ notes, onNotesChange, playback, volume
     setPreviewNotes(null);
     erasingRef.current = false;
   };
+  const setTimelineScroll = (left) => {
+    if (rollViewportRef.current) rollViewportRef.current.scrollLeft = left;
+  };
 
   return (
     <main className={`editorPanel ${playback.isPlaying ? "isPlaying" : ""}`}>
@@ -126,7 +168,14 @@ export default function PianoRollEditor({ notes, onNotesChange, playback, volume
         <label className="volumeControl"><span>Volume {Math.round(volume * 100)}%</span><input type="range" min="0" max="1" step="0.01" value={volume} onChange={(event) => onVolumeChange(Number(event.target.value))} /></label>
         <span className="hintText">Klikšķis: pievienot · velciet fonā: izcelt · Ctrl+A: visas · Ctrl+C/V: kopēt/ielīmēt</span>
       </section>
-      <SeekBar playheadX={playheadX} onSeek={seek} onHorizontalScroll={(delta) => { if (rollViewportRef.current) rollViewportRef.current.scrollLeft += delta; }} keyboardWidth={KEYBOARD_WIDTH} totalWidth={playbackWidth} totalBeats={playbackBeats} label="LAIKS" sliderLabel="Atskaņošanas pozīcija" overviewItems={notes.map((note) => ({ id: note.id, start: note.beat * CELL_WIDTH, length: (note.length || 1) * CELL_WIDTH }))} />
+      <SeekBar playheadX={horizontalScroll.left} onSeek={setTimelineScroll} keyboardWidth={KEYBOARD_WIDTH} totalWidth={totalWidth} totalBeats={totalBeats} viewportWidth={horizontalScroll.width} interactionMax={horizontalScroll.max} overviewItems={notes.map((note) => ({ id: note.id, start: note.beat * CELL_WIDTH, length: (note.length || 1) * CELL_WIDTH }))} label="PROJEKTS" sliderLabel="Projekta pārskata ritināšana" scrollBarMode />
+      <div className="pianoRollPlayheadPosition">
+        <label htmlFor="piano-roll-playhead-position">ATSKAŅA</label>
+        <div className="pianoRollPlayheadTrack" ref={playheadTrackRef} style={{ width: horizontalScroll.width }}>
+          <input id="piano-roll-playhead-position" type="range" min="0" max={horizontalScroll.width} step="any" value={visiblePlayheadPosition} onChange={(event) => seek(horizontalScroll.left + Number(event.target.value))} aria-label="Atskaņošanas līnijas pozīcija" aria-valuetext={`${(playheadX / CELL_WIDTH).toFixed(2)} sitieni`} />
+          <span className="pianoRollPlayheadMarker" ref={playheadMarkerRef} aria-hidden="true" />
+        </div>
+      </div>
       <div className="rollViewport" ref={rollViewportRef}>
         <div className="keyboardLabels" aria-hidden="true">{Array.from({ length: GRID_ROWS }, (_, row) => { const note = getNoteName(row); return <div className={`keyLabel ${note.includes("#") ? "blackKey" : ""}`} key={note}>{note}</div>; })}</div>
         <div ref={pianoRollRef} className={`pianoRoll ${readOnly ? "readOnly" : ""}`} style={{ width: totalWidth, height: GRID_ROWS * CELL_HEIGHT }}
@@ -143,7 +192,7 @@ export default function PianoRollEditor({ notes, onNotesChange, playback, volume
               setSelectionBox(box);
             } else if (interaction.type === "move") {
               const deltaBeat = Math.round((x - interaction.startX) / (CELL_WIDTH / 2)) / 2; const deltaRow = Math.round((y - interaction.startY) / CELL_HEIGHT); const ids = new Set(interaction.ids);
-              const moved = interaction.original.map((note) => ids.has(note.id) ? { ...note, beat: Math.max(0, Math.min(TOTAL_BEATS - (note.length || 1), note.beat + deltaBeat)), row: Math.max(0, Math.min(GRID_ROWS - 1, note.row + deltaRow)) } : note);
+              const moved = interaction.original.map((note) => ids.has(note.id) ? { ...note, beat: Math.max(0, Math.min(totalBeats - (note.length || 1), note.beat + deltaBeat)), row: Math.max(0, Math.min(GRID_ROWS - 1, note.row + deltaRow)) } : note);
               interaction.preview = moved; setPreviewNotes(interaction.preview);
             }
           }}
@@ -166,7 +215,7 @@ export default function PianoRollEditor({ notes, onNotesChange, playback, volume
           onPointerUp={readOnly ? undefined : finishPointer}
           onPointerCancel={readOnly ? undefined : () => { interactionRef.current = null; selectionBoxRef.current = null; setSelectionBox(null); setPreviewNotes(null); erasingRef.current = false; }}
           onContextMenu={readOnly ? undefined : (event) => { event.preventDefault(); removeNote(event, CELL_WIDTH, CELL_HEIGHT); }}>
-          <PianoRollGrid />
+          <PianoRollGrid totalBeats={totalBeats} />
           <div className="playhead" ref={playheadRef} aria-hidden="true" />
           {selectionBox && <div className="noteSelectionBox" style={selectionBox} />}
           {(previewNotes || notes).map((note) => <div className={`placedNote ${activeBeat === Math.round(note.beat * 2) ? "triggered" : ""} ${selectedNotes.includes(note.id) ? "selected" : ""}`} data-note-id={readOnly ? undefined : note.id} style={{ left: note.beat * CELL_WIDTH, top: note.row * CELL_HEIGHT, width: Math.max(12, (note.length || 1) * CELL_WIDTH - 2), height: CELL_HEIGHT - 2 }} onContextMenu={readOnly ? undefined : (event) => { event.preventDefault(); event.stopPropagation(); onNotesChange(notes.filter((item) => item.id !== note.id)); setSelectedNotes((current) => current.filter((id) => id !== note.id)); }} key={note.id}>{!readOnly && <span className="noteResize" onPointerDown={(event) => {

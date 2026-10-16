@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ImportProjectRequest;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Models\Project;
@@ -25,6 +26,11 @@ class ProjectController extends Controller
         return response()->json([
             'project' => $this->userProject($request, $project),
         ]);
+    }
+
+    public function import(ImportProjectRequest $request): JsonResponse
+    {
+        return response()->json(['data' => $request->validated('data')]);
     }
 
     public function store(StoreProjectRequest $request): JsonResponse

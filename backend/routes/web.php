@@ -8,6 +8,7 @@ use App\Http\Controllers\SignupController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/session/csrf-token', [SessionController::class, 'csrfToken'])->name('session.csrf-token');
+Route::post('/projects/import', [ProjectController::class, 'import'])->name('projects.import');
 Route::get('/publications', [PublicationController::class, 'index'])->name('publications.index');
 Route::get('/publications/{project}', [PublicationController::class, 'show'])->name('publications.show');
 Route::get('/publications/{project}/data', [PublicationController::class, 'data'])->name('publications.data');

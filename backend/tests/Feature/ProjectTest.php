@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class ProjectTest extends TestCase
@@ -26,6 +27,37 @@ class ProjectTest extends TestCase
             'user_id' => $user->id,
             'title' => 'Mana dziesma',
         ]);
+    }
+
+    public function test_project_json_file_is_validated_and_returned_for_import(): void
+    {
+        $projectData = $this->projectPayload()['data'];
+        $file = UploadedFile::fake()->createWithContent('mana-dziesma.json', json_encode($projectData, JSON_THROW_ON_ERROR));
+
+        $this->post(route('projects.import'), ['file' => $file], ['Accept' => 'application/json'])
+            ->assertOk()
+            ->assertJsonPath('data.bpm', 160)
+            ->assertJsonPath('data.patterns.0.id', 'pattern-1');
+    }
+
+    public function test_project_import_rejects_malformed_json(): void
+    {
+        $file = UploadedFile::fake()->createWithContent('broken.json', '{invalid');
+
+        $this->post(route('projects.import'), ['file' => $file], ['Accept' => 'application/json'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['file']);
+    }
+
+    public function test_project_import_rejects_invalid_project_data(): void
+    {
+        $projectData = $this->projectPayload()['data'];
+        $projectData['bpm'] = 300;
+        $file = UploadedFile::fake()->createWithContent('invalid-project.json', json_encode($projectData, JSON_THROW_ON_ERROR));
+
+        $this->post(route('projects.import'), ['file' => $file], ['Accept' => 'application/json'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['data.bpm']);
     }
 
     public function test_home_only_lists_projects_belonging_to_authenticated_user(): void

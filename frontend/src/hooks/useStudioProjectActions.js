@@ -1,32 +1,4 @@
-import { MAX_BPM, MAX_TIMELINE_BEATS, MIN_BPM } from "../config/studio";
-
-const isValidProjectData = (projectData) => {
-  if (!projectData || !Number.isInteger(projectData.bpm) || projectData.bpm < MIN_BPM || projectData.bpm > MAX_BPM) return false;
-  if (!Array.isArray(projectData.patterns) || projectData.patterns.length === 0) return false;
-  if (!Array.isArray(projectData.arrangement)) return false;
-
-  const patternIds = new Set();
-  for (const pattern of projectData.patterns) {
-    if (!pattern || typeof pattern.id !== "string" || !pattern.id || patternIds.has(pattern.id)) return false;
-    if (typeof pattern.name !== "string" || !Array.isArray(pattern.notes)) return false;
-    if (pattern.length !== undefined && (!Number.isFinite(pattern.length) || pattern.length <= 0)) return false;
-    patternIds.add(pattern.id);
-
-    for (const note of pattern.notes) {
-      if (!note || typeof note.id !== "string" || !Number.isInteger(note.row) || note.row < 0 || note.row >= 88) return false;
-      if (!Number.isFinite(note.beat) || note.beat < 0 || note.beat >= MAX_TIMELINE_BEATS) return false;
-      if (note.length !== undefined && (!Number.isFinite(note.length) || note.length <= 0 || note.beat + note.length > MAX_TIMELINE_BEATS)) return false;
-    }
-  }
-
-  return projectData.arrangement.every((clip) => clip
-    && typeof clip.id === "string"
-    && patternIds.has(clip.patternId)
-    && Number.isInteger(clip.startBeat)
-    && clip.startBeat >= 0
-    && clip.startBeat < MAX_TIMELINE_BEATS
-    && (clip.track === undefined || (Number.isInteger(clip.track) && clip.track >= 0 && clip.track < 12)));
-};
+import { getCsrfToken } from "./useSessionUser";
 
 export default function useStudioProjectActions({ workspace, project, isReadOnly, save }) {
   const handleSave = async () => {
@@ -71,17 +43,32 @@ export default function useStudioProjectActions({ workspace, project, isReadOnly
     if (!file) return;
 
     try {
-      const data = JSON.parse(await file.text());
-      const projectData = data?.data ?? data;
-      if (!isValidProjectData(projectData)) {
-        throw new Error("Invalid project structure");
-      }
-      workspace.loadProject(projectData, true);
-    } catch {
-      window.alert("Failā nav derīgs WebMuzic projekta JSON.");
-    }
+      const { token } = await getCsrfToken();
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await fetch("/projects/import", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "X-CSRF-TOKEN": token,
+        },
+        body: formData,
+      });
 
-    event.target.value = "";
+      if (!response.ok) {
+        throw new Error(response.status === 422
+          ? "Failā nav derīgs WebMuzic projekta JSON."
+          : "Projektu neizdevās importēt.");
+      }
+
+      const { data: projectData } = await response.json();
+      workspace.loadProject(projectData, true);
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : "Projektu neizdevās importēt.");
+    } finally {
+      event.target.value = "";
+    }
   };
 
   return { handleSave, exportProject, importProject };

@@ -57,10 +57,10 @@ class StoreProjectRequest extends FormRequest
     /**
      * @return array<string, ValidationRule|array<mixed>|string>
      */
-    protected function projectRules(): array
+    protected function projectRules(bool $requireTitle = true): array
     {
         return [
-            'title' => ['required', 'string', 'max:255'],
+            ...($requireTitle ? ['title' => ['required', 'string', 'max:255']] : []),
             'data' => ['required', 'array'],
             'data.bpm' => ['required', 'integer', 'between:40,240'],
             'data.patterns' => ['required', 'array', 'min:1'],
